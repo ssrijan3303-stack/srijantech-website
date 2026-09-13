@@ -1,5 +1,6 @@
 import React from 'react';
-import { Service, Project, PricingPlan, Testimonial, Faq } from '../types';
+import { Service, Project, PricingPlan, Testimonial, Faq, WebsiteSettings } from '../types';
+import { initialSettings } from '../data/defaultData';
 import {
   ArrowRight,
   Sparkles,
@@ -18,6 +19,7 @@ import {
   Laptop,
 } from 'lucide-react';
 import { ProjectImage } from '../components/ProjectImage';
+import { AboutSection } from '../components/AboutSection';
 
 interface HomePageProps {
   services: Service[];
@@ -25,6 +27,7 @@ interface HomePageProps {
   pricing: PricingPlan[];
   testimonials: Testimonial[];
   faqs: Faq[];
+  settings?: WebsiteSettings;
   onNavigate: (tab: string) => void;
   onOpenEnquiry: (serviceId?: string) => void;
   onSelectProject: (project: Project) => void;
@@ -38,6 +41,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   pricing,
   testimonials,
   faqs,
+  settings,
   onNavigate,
   onOpenEnquiry,
   onSelectProject,
@@ -273,6 +277,13 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
         </div>
       </section>
+
+      {/* ABOUT SRIJANTECH & FOUNDER SECTION */}
+      <AboutSection
+        settings={settings || initialSettings}
+        onOpenEnquiry={() => onOpenEnquiry()}
+        onNavigate={onNavigate}
+      />
 
       {/* 4. FEATURED PROJECTS / CONCEPTS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -63,6 +63,7 @@ import {
   RefreshCw,
   Search,
   Check,
+  Camera,
 } from 'lucide-react';
 
 interface AdminDashboardPageProps {
@@ -943,15 +944,46 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ adminUse
 
             <div>
               <label className="block text-slate-300 font-medium mb-1">
-                Founder Photo URL (Optional override)
+                Founder Photo Asset (/assets/founder.jpeg)
               </label>
-              <input
-                type="text"
-                value={settings.founder_photo_url || ''}
-                onChange={(e) => setSettings({ ...settings, founder_photo_url: e.target.value })}
-                placeholder="https://example.com/founder-photo.jpg"
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-cyan-500"
-              />
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={settings.founder_photo_url || ''}
+                  onChange={(e) => setSettings({ ...settings, founder_photo_url: e.target.value })}
+                  placeholder="/assets/founder.jpeg"
+                  className="flex-1 px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-cyan-500"
+                />
+                <label className="cursor-pointer px-3 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-semibold flex items-center gap-1.5 transition-all">
+                  <Camera className="w-3.5 h-3.5" />
+                  <span>Upload</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = async (event) => {
+                          const b64 = event.target?.result as string;
+                          if (b64) {
+                            setSettings({ ...settings, founder_photo_url: '/assets/founder.jpeg' });
+                            localStorage.setItem('srijantech_founder_photo', b64);
+                            window.dispatchEvent(new CustomEvent('founder_photo_updated', { detail: b64 }));
+                            await fetch('/api/upload-founder-photo', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ imageBase64: b64 }),
+                            });
+                          }
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                </label>
+              </div>
             </div>
           </div>
 

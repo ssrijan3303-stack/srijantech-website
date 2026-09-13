@@ -192,6 +192,7 @@ export default function App() {
             pricing={pricing}
             testimonials={testimonials}
             faqs={faqs}
+            settings={settings}
             onNavigate={navigateTo}
             onOpenEnquiry={handleOpenEnquiry}
             onSelectProject={(p) => setActiveProjectModal(p)}

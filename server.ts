@@ -1,12 +1,14 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
+import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json());
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
   // 1. Health check
   app.get('/api/health', (_req: Request, res: Response) => {
@@ -15,6 +17,61 @@ async function startServer() {
       service: 'SrijanTech API Core',
       timestamp: new Date().toISOString(),
       location: 'Varanasi, Uttar Pradesh, India',
+    });
+  });
+
+  // Photo upload endpoint to store founder photo permanently in project assets for Vercel/GitHub
+  app.post('/api/upload-founder-photo', (req: Request, res: Response) => {
+    try {
+      const { imageBase64 } = req.body;
+      if (!imageBase64) {
+        return res.status(400).json({ error: 'imageBase64 required' });
+      }
+      const cleanBase64 = imageBase64.replace(/^data:image\/[a-zA-Z0-9+]+;base64,/, '');
+      const buffer = Buffer.from(cleanBase64, 'base64');
+
+      const publicAssetsDir = path.join(process.cwd(), 'public', 'assets');
+      const distAssetsDir = path.join(process.cwd(), 'dist', 'assets');
+      const srcAssetsDir = path.join(process.cwd(), 'src', 'assets');
+
+      if (!fs.existsSync(publicAssetsDir)) fs.mkdirSync(publicAssetsDir, { recursive: true });
+      if (!fs.existsSync(distAssetsDir)) fs.mkdirSync(distAssetsDir, { recursive: true });
+      if (!fs.existsSync(srcAssetsDir)) fs.mkdirSync(srcAssetsDir, { recursive: true });
+
+      // Save to all standard asset locations
+      fs.writeFileSync(path.join(publicAssetsDir, 'founder.jpeg'), buffer);
+      fs.writeFileSync(path.join(publicAssetsDir, 'founder.jpg'), buffer);
+      fs.writeFileSync(path.join(publicAssetsDir, 'founder.png'), buffer);
+
+      fs.writeFileSync(path.join(distAssetsDir, 'founder.jpeg'), buffer);
+      fs.writeFileSync(path.join(distAssetsDir, 'founder.jpg'), buffer);
+      fs.writeFileSync(path.join(distAssetsDir, 'founder.png'), buffer);
+
+      fs.writeFileSync(path.join(srcAssetsDir, 'founder.jpeg'), buffer);
+      fs.writeFileSync(path.join(srcAssetsDir, 'founder.jpg'), buffer);
+
+      res.json({
+        success: true,
+        url: '/assets/founder.jpeg',
+        message: 'Founder photo successfully written to public/assets/founder.jpeg and public/assets/founder.jpg',
+      });
+    } catch (err) {
+      console.error('Failed to write founder photo:', err);
+      res.status(500).json({ error: 'Failed to write founder photo to filesystem' });
+    }
+  });
+
+  app.get('/api/founder-photo-status', (_req: Request, res: Response) => {
+    const publicJpeg = path.join(process.cwd(), 'public', 'assets', 'founder.jpeg');
+    const publicJpg = path.join(process.cwd(), 'public', 'assets', 'founder.jpg');
+    const publicPng = path.join(process.cwd(), 'public', 'assets', 'founder.png');
+
+    res.json({
+      hasJpeg: fs.existsSync(publicJpeg),
+      hasJpg: fs.existsSync(publicJpg),
+      hasPng: fs.existsSync(publicPng),
+      jpegSize: fs.existsSync(publicJpeg) ? fs.statSync(publicJpeg).size : 0,
+      pngSize: fs.existsSync(publicPng) ? fs.statSync(publicPng).size : 0,
     });
   });
 
