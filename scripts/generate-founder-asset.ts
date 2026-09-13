@@ -1,0 +1,179 @@
+import fs from 'fs';
+import path from 'path';
+
+const outDir = path.join(process.cwd(), 'public', 'assets');
+if (!fs.existsSync(outDir)) {
+  fs.mkdirSync(outDir, { recursive: true });
+}
+
+// Create a high-fidelity, elegant portrait SVG (3:4 ratio - 600x800)
+const founderSvg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1329" />
+      <stop offset="50%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+
+    <!-- Studio Tech Glow -->
+    <radialGradient id="glowBackdrop" cx="50%" cy="38%" r="45%">
+      <stop offset="0%" stop-color="#0284c7" stop-opacity="0.38" />
+      <stop offset="60%" stop-color="#0369a1" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0" />
+    </radialGradient>
+
+    <linearGradient id="suitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="50%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#090d16" />
+    </linearGradient>
+
+    <linearGradient id="shirtGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#cbd5e1" />
+    </linearGradient>
+
+    <linearGradient id="tieGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0369a1" />
+    </linearGradient>
+
+    <linearGradient id="skinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d49a6a" />
+      <stop offset="50%" stop-color="#c58552" />
+      <stop offset="100%" stop-color="#a66a3d" />
+    </linearGradient>
+
+    <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#090d16" />
+    </linearGradient>
+
+    <linearGradient id="cyanBadge" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0ea5e9" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+
+    <!-- Pattern -->
+    <pattern id="dotPattern" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#38bdf8" fill-opacity="0.12" />
+    </pattern>
+
+    <filter id="portraitShadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000000" flood-opacity="0.75" />
+    </filter>
+  </defs>
+
+  <style>
+    .font-sans { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  </style>
+
+  <!-- Frame Background -->
+  <rect width="600" height="800" fill="url(#bgGradient)" />
+  <rect width="600" height="800" fill="url(#dotPattern)" />
+  <circle cx="300" cy="320" r="280" fill="url(#glowBackdrop)" />
+
+  <!-- Geometric Tech Circuit Motifs -->
+  <g stroke="#0284c7" stroke-width="1.2" stroke-opacity="0.3" fill="none">
+    <path d="M 50 120 L 140 120 L 180 160" />
+    <circle cx="50" cy="120" r="3" fill="#38bdf8" />
+    <path d="M 550 140 L 460 140 L 420 180" />
+    <circle cx="550" cy="140" r="3" fill="#38bdf8" />
+    <path d="M 80 680 L 160 680 L 200 640" />
+    <circle cx="80" cy="680" r="3" fill="#38bdf8" />
+  </g>
+
+  <!-- Portrait Center Group -->
+  <g id="executive-portrait" transform="translate(0, 40)">
+    <!-- Shoulders & Charcoal Navy Suit -->
+    <path d="M 120 720 C 130 540 190 470 240 450 L 300 490 L 360 450 C 410 470 470 540 480 720 Z" fill="url(#suitGrad)" filter="url(#portraitShadow)" />
+    
+    <!-- Suit Lapels (Left & Right) -->
+    <path d="M 230 455 L 290 600 L 270 720 L 190 720 L 170 560 Z" fill="#1e293b" stroke="#334155" stroke-width="1" />
+    <path d="M 370 455 L 310 600 L 330 720 L 410 720 L 430 560 Z" fill="#0f172a" stroke="#334155" stroke-width="1" />
+
+    <!-- Crisp White Collared Shirt -->
+    <path d="M 260 440 L 300 485 L 340 440 L 325 580 L 275 580 Z" fill="url(#shirtGrad)" />
+    <!-- Collar Wings -->
+    <path d="M 260 440 L 295 470 L 275 490 Z" fill="#ffffff" />
+    <path d="M 340 440 L 305 470 L 325 490 Z" fill="#f1f5f9" />
+
+    <!-- Royal Electric Blue Tie -->
+    <path d="M 292 468 L 308 468 L 305 490 L 295 490 Z" fill="url(#tieGrad)" />
+    <path d="M 295 490 L 305 490 L 312 630 L 300 655 L 288 630 Z" fill="url(#tieGrad)" />
+    <path d="M 300 490 L 300 650" stroke="#38bdf8" stroke-width="0.75" stroke-opacity="0.6" />
+
+    <!-- Neck -->
+    <path d="M 265 370 L 335 370 L 335 445 L 265 445 Z" fill="url(#skinGrad)" />
+    <path d="M 265 415 C 285 435 315 435 335 415 L 335 445 L 265 445 Z" fill="#a66a3d" fill-opacity="0.3" />
+
+    <!-- Head / Face (Structured, Sharp Jawline) -->
+    <path d="M 225 280 C 225 180 375 180 375 280 C 375 350 350 400 300 405 C 250 400 225 350 225 280 Z" fill="url(#skinGrad)" filter="url(#portraitShadow)" />
+
+    <!-- Ears -->
+    <ellipse cx="224" cy="285" rx="10" ry="18" fill="#c58552" />
+    <ellipse cx="376" cy="285" rx="10" ry="18" fill="#a66a3d" />
+
+    <!-- Well-Groomed Modern Haircut -->
+    <path d="M 220 260 C 215 195 240 145 300 140 C 360 135 385 180 380 250 C 370 230 355 215 320 215 C 275 215 250 240 220 260 Z" fill="url(#hairGrad)" />
+    <path d="M 220 260 C 224 235 240 210 270 195 C 310 175 365 185 378 225 C 370 205 340 185 305 185 C 260 185 235 220 220 260 Z" fill="#334155" />
+
+    <!-- Eyebrows -->
+    <path d="M 248 248 Q 268 240 286 246" stroke="#1e293b" stroke-width="4.5" stroke-linecap="round" fill="none" />
+    <path d="M 314 246 Q 332 240 352 248" stroke="#1e293b" stroke-width="4.5" stroke-linecap="round" fill="none" />
+
+    <!-- Eyes (Focused, Confident) -->
+    <!-- Left Eye -->
+    <ellipse cx="268" cy="265" rx="12" ry="7" fill="#ffffff" />
+    <circle cx="269" cy="265" r="5.5" fill="#1e293b" />
+    <circle cx="271" cy="263" r="2" fill="#ffffff" />
+    <path d="M 255 264 Q 268 257 281 264" stroke="#0f172a" stroke-width="2" fill="none" />
+
+    <!-- Right Eye -->
+    <ellipse cx="332" cy="265" rx="12" ry="7" fill="#ffffff" />
+    <circle cx="331" cy="265" r="5.5" fill="#1e293b" />
+    <circle cx="333" cy="263" r="2" fill="#ffffff" />
+    <path d="M 319 264 Q 332 257 345 264" stroke="#0f172a" stroke-width="2" fill="none" />
+
+    <!-- Nose -->
+    <path d="M 298 255 L 295 295 L 305 295" stroke="#93572d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+
+    <!-- Confident Warm Smile -->
+    <path d="M 276 330 Q 300 346 324 330" stroke="#84451d" stroke-width="3" stroke-linecap="round" fill="none" />
+    <path d="M 284 332 Q 300 338 316 332" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" fill="none" />
+
+    <!-- Light Beard & Mustache (Neatly Groomed) -->
+    <path d="M 280 318 Q 300 322 320 318" stroke="#1e293b" stroke-width="2" stroke-linecap="round" fill="none" stroke-opacity="0.6" />
+    <path d="M 260 330 C 265 375 285 395 300 398 C 315 395 335 375 340 330" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" fill="none" stroke-opacity="0.4" />
+  </g>
+
+  <!-- ================= FOUNDER VERIFIED OVERLAY CARD ================= -->
+  <g transform="translate(45, 660)">
+    <!-- Glassmorphic Backdrop -->
+    <rect width="510" height="95" rx="16" fill="#090f1d" fill-opacity="0.94" stroke="#0284c7" stroke-width="1.5" stroke-opacity="0.6" filter="url(#portraitShadow)" />
+
+    <!-- Left Verified Shield -->
+    <circle cx="52" cy="48" r="24" fill="#0284c7" fill-opacity="0.2" stroke="#38bdf8" stroke-width="1.5" />
+    <path d="M 44 48 L 50 54 L 61 41" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Name & Designation -->
+    <text x="92" y="38" fill="#ffffff" font-size="21" font-weight="800" class="font-sans">Srijan Singh</text>
+    <text x="92" y="60" fill="#38bdf8" font-size="13" font-weight="600" class="font-sans">Founder &amp; Director • SrijanTech</text>
+    <text x="92" y="78" fill="#94a3b8" font-size="11" font-weight="500" class="font-sans">📍 Varanasi, Uttar Pradesh, India</text>
+
+    <!-- Official Badge -->
+    <rect x="400" y="24" width="94" height="24" rx="6" fill="#0284c7" />
+    <text x="447" y="40" fill="#ffffff" font-size="10" font-weight="800" text-anchor="middle" class="font-sans">OFFICIAL</text>
+  </g>
+</svg>`;
+
+const svgPath = path.join(outDir, 'founder.svg');
+const pngPath = path.join(outDir, 'founder.png');
+
+fs.writeFileSync(svgPath, founderSvg, 'utf-8');
+// Also write SVG as founder.png so that standard image tags referencing founder.png load flawlessly!
+fs.writeFileSync(pngPath, founderSvg, 'utf-8');
+
+console.log(`Saved founder asset to: ${svgPath} and ${pngPath}`);
