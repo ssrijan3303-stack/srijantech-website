@@ -30,15 +30,30 @@ async function startServer() {
       const cleanBase64 = imageBase64.replace(/^data:image\/[a-zA-Z0-9+]+;base64,/, '');
       const buffer = Buffer.from(cleanBase64, 'base64');
 
+      const dirs = [
+        path.join(process.cwd(), 'public', 'images', 'founder'),
+        path.join(process.cwd(), 'public', 'assets'),
+        path.join(process.cwd(), 'dist', 'images', 'founder'),
+        path.join(process.cwd(), 'dist', 'assets'),
+        path.join(process.cwd(), 'src', 'assets'),
+      ];
+
+      for (const dir of dirs) {
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      }
+
+      // Save to all requested locations
+      const publicFounderDir = path.join(process.cwd(), 'public', 'images', 'founder');
+      const distFounderDir = path.join(process.cwd(), 'dist', 'images', 'founder');
       const publicAssetsDir = path.join(process.cwd(), 'public', 'assets');
       const distAssetsDir = path.join(process.cwd(), 'dist', 'assets');
       const srcAssetsDir = path.join(process.cwd(), 'src', 'assets');
 
-      if (!fs.existsSync(publicAssetsDir)) fs.mkdirSync(publicAssetsDir, { recursive: true });
-      if (!fs.existsSync(distAssetsDir)) fs.mkdirSync(distAssetsDir, { recursive: true });
-      if (!fs.existsSync(srcAssetsDir)) fs.mkdirSync(srcAssetsDir, { recursive: true });
+      fs.writeFileSync(path.join(publicFounderDir, 'srijan-singh-founder.jpg'), buffer);
+      fs.writeFileSync(path.join(publicFounderDir, 'srijan-singh-founder.png'), buffer);
+      fs.writeFileSync(path.join(distFounderDir, 'srijan-singh-founder.jpg'), buffer);
+      fs.writeFileSync(path.join(distFounderDir, 'srijan-singh-founder.png'), buffer);
 
-      // Save to all standard asset locations
       fs.writeFileSync(path.join(publicAssetsDir, 'founder.jpeg'), buffer);
       fs.writeFileSync(path.join(publicAssetsDir, 'founder.jpg'), buffer);
       fs.writeFileSync(path.join(publicAssetsDir, 'founder.png'), buffer);
@@ -52,8 +67,8 @@ async function startServer() {
 
       res.json({
         success: true,
-        url: '/assets/founder.jpeg',
-        message: 'Founder photo successfully written to public/assets/founder.jpeg and public/assets/founder.jpg',
+        url: '/images/founder/srijan-singh-founder.jpg',
+        message: 'Founder photo written to /public/images/founder/srijan-singh-founder.jpg and /public/assets/founder.jpg',
       });
     } catch (err) {
       console.error('Failed to write founder photo:', err);
@@ -62,16 +77,18 @@ async function startServer() {
   });
 
   app.get('/api/founder-photo-status', (_req: Request, res: Response) => {
+    const permanentJpg = path.join(process.cwd(), 'public', 'images', 'founder', 'srijan-singh-founder.jpg');
     const publicJpeg = path.join(process.cwd(), 'public', 'assets', 'founder.jpeg');
     const publicJpg = path.join(process.cwd(), 'public', 'assets', 'founder.jpg');
     const publicPng = path.join(process.cwd(), 'public', 'assets', 'founder.png');
 
     res.json({
+      hasPermanentJpg: fs.existsSync(permanentJpg),
       hasJpeg: fs.existsSync(publicJpeg),
       hasJpg: fs.existsSync(publicJpg),
       hasPng: fs.existsSync(publicPng),
-      jpegSize: fs.existsSync(publicJpeg) ? fs.statSync(publicJpeg).size : 0,
-      pngSize: fs.existsSync(publicPng) ? fs.statSync(publicPng).size : 0,
+      permanentJpgSize: fs.existsSync(permanentJpg) ? fs.statSync(permanentJpg).size : 0,
+      preferredUrl: '/images/founder/srijan-singh-founder.jpg',
     });
   });
 

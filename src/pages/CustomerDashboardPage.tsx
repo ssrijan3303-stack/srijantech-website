@@ -22,7 +22,9 @@ import {
   ExternalLink,
   MessageSquare,
   Sparkles,
+  FolderGit2,
 } from 'lucide-react';
+import { CustomerProjectsSection } from '../components/CustomerProjectsSection';
 
 interface CustomerDashboardPageProps {
   user: UserProfile;
@@ -33,9 +35,9 @@ export const CustomerDashboardPage: React.FC<CustomerDashboardPageProps> = ({
   user,
   onNavigateToPayment,
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'invoices' | 'payments' | 'tickets'>(
-    'overview'
-  );
+  const [activeTab, setActiveTab] = useState<
+    'overview' | 'projects' | 'invoices' | 'payments' | 'tickets'
+  >('overview');
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [payments, setPayments] = useState<PaymentTransaction[]>([]);
   const [enquiries, setEnquiries] = useState<ProjectEnquiry[]>([]);
@@ -140,6 +142,7 @@ export const CustomerDashboardPage: React.FC<CustomerDashboardPageProps> = ({
       <div className="flex items-center gap-2 border-b border-slate-800 pb-2 overflow-x-auto">
         {[
           { id: 'overview', label: 'Account Overview', icon: Layers },
+          { id: 'projects', label: 'Projects & Work Time', icon: FolderGit2 },
           { id: 'invoices', label: `Tax Invoices (${invoices.length})`, icon: FileText },
           { id: 'payments', label: `UPI Payments (${payments.length})`, icon: CreditCard },
           { id: 'tickets', label: `Support Tickets (${tickets.length})`, icon: HelpCircle },
@@ -233,6 +236,11 @@ export const CustomerDashboardPage: React.FC<CustomerDashboardPageProps> = ({
             )}
           </div>
         </div>
+      )}
+
+      {/* Tab: Projects & Work Time */}
+      {activeTab === 'projects' && (
+        <CustomerProjectsSection customerEmail={user.email} />
       )}
 
       {/* Tab 2: Invoices */}

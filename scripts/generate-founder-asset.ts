@@ -1,9 +1,21 @@
 import fs from 'fs';
 import path from 'path';
+import { Resvg } from '@resvg/resvg-js';
+import jpeg from 'jpeg-js';
 
-const outDir = path.join(process.cwd(), 'public', 'assets');
-if (!fs.existsSync(outDir)) {
-  fs.mkdirSync(outDir, { recursive: true });
+// Directories to ensure exist
+const targets = [
+  path.join(process.cwd(), 'public', 'images', 'founder'),
+  path.join(process.cwd(), 'public', 'assets'),
+  path.join(process.cwd(), 'dist', 'images', 'founder'),
+  path.join(process.cwd(), 'dist', 'assets'),
+  path.join(process.cwd(), 'src', 'assets'),
+];
+
+for (const dir of targets) {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
 }
 
 // Create a high-fidelity, elegant portrait SVG (3:4 ratio - 600x800)
@@ -12,48 +24,43 @@ const founderSvg = `<?xml version="1.0" encoding="UTF-8"?>
   <defs>
     <!-- Background Gradients -->
     <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0b1329" />
-      <stop offset="50%" stop-color="#0f172a" />
-      <stop offset="100%" stop-color="#020617" />
+      <stop offset="0%" stop-color="#050c1e" />
+      <stop offset="50%" stop-color="#0b1736" />
+      <stop offset="100%" stop-color="#020612" />
     </linearGradient>
 
     <!-- Studio Tech Glow -->
-    <radialGradient id="glowBackdrop" cx="50%" cy="38%" r="45%">
-      <stop offset="0%" stop-color="#0284c7" stop-opacity="0.38" />
-      <stop offset="60%" stop-color="#0369a1" stop-opacity="0.12" />
-      <stop offset="100%" stop-color="#0f172a" stop-opacity="0" />
+    <radialGradient id="glowBackdrop" cx="50%" cy="38%" r="48%">
+      <stop offset="0%" stop-color="#0284c7" stop-opacity="0.45" />
+      <stop offset="50%" stop-color="#0369a1" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#0b1736" stop-opacity="0" />
     </radialGradient>
 
     <linearGradient id="suitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1e293b" />
-      <stop offset="50%" stop-color="#0f172a" />
-      <stop offset="100%" stop-color="#090d16" />
+      <stop offset="0%" stop-color="#24324a" />
+      <stop offset="50%" stop-color="#152033" />
+      <stop offset="100%" stop-color="#0b101c" />
     </linearGradient>
 
     <linearGradient id="shirtGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#f8fafc" />
-      <stop offset="100%" stop-color="#cbd5e1" />
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#dbeafe" />
     </linearGradient>
 
     <linearGradient id="tieGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0284c7" />
-      <stop offset="100%" stop-color="#0369a1" />
+      <stop offset="0%" stop-color="#0ea5e9" />
+      <stop offset="100%" stop-color="#0284c7" />
     </linearGradient>
 
     <linearGradient id="skinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#d49a6a" />
-      <stop offset="50%" stop-color="#c58552" />
-      <stop offset="100%" stop-color="#a66a3d" />
+      <stop offset="0%" stop-color="#d99f70" />
+      <stop offset="50%" stop-color="#c68552" />
+      <stop offset="100%" stop-color="#a4683c" />
     </linearGradient>
 
     <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#1e293b" />
       <stop offset="100%" stop-color="#090d16" />
-    </linearGradient>
-
-    <linearGradient id="cyanBadge" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#0ea5e9" />
-      <stop offset="100%" stop-color="#38bdf8" />
     </linearGradient>
 
     <!-- Pattern -->
@@ -169,11 +176,44 @@ const founderSvg = `<?xml version="1.0" encoding="UTF-8"?>
   </g>
 </svg>`;
 
-const svgPath = path.join(outDir, 'founder.svg');
-const pngPath = path.join(outDir, 'founder.png');
+// Render real binary PNG
+const resvg = new Resvg(founderSvg, {
+  fitTo: { mode: 'width', value: 800 },
+});
+const rendered = resvg.render();
+const pngBuffer = rendered.asPng();
 
-fs.writeFileSync(svgPath, founderSvg, 'utf-8');
-// Also write SVG as founder.png so that standard image tags referencing founder.png load flawlessly!
-fs.writeFileSync(pngPath, founderSvg, 'utf-8');
+// Encode real JFIF binary JPEG
+const jpegData = jpeg.encode(
+  {
+    data: rendered.pixels,
+    width: rendered.width,
+    height: rendered.height,
+  },
+  92
+);
+const jpegBuffer = Buffer.from(jpegData.data);
 
-console.log(`Saved founder asset to: ${svgPath} and ${pngPath}`);
+// Define destination paths
+const outputs = [
+  { path: path.join(process.cwd(), 'public', 'images', 'founder', 'srijan-singh-founder.jpg'), data: jpegBuffer },
+  { path: path.join(process.cwd(), 'public', 'images', 'founder', 'srijan-singh-founder.png'), data: pngBuffer },
+  { path: path.join(process.cwd(), 'public', 'assets', 'founder.jpg'), data: jpegBuffer },
+  { path: path.join(process.cwd(), 'public', 'assets', 'founder.jpeg'), data: jpegBuffer },
+  { path: path.join(process.cwd(), 'public', 'assets', 'founder.png'), data: pngBuffer },
+  { path: path.join(process.cwd(), 'public', 'assets', 'founder.svg'), data: Buffer.from(founderSvg, 'utf-8') },
+  { path: path.join(process.cwd(), 'src', 'assets', 'founder.jpg'), data: jpegBuffer },
+  { path: path.join(process.cwd(), 'dist', 'images', 'founder', 'srijan-singh-founder.jpg'), data: jpegBuffer },
+  { path: path.join(process.cwd(), 'dist', 'assets', 'founder.jpg'), data: jpegBuffer },
+  { path: path.join(process.cwd(), 'dist', 'assets', 'founder.jpeg'), data: jpegBuffer },
+  { path: path.join(process.cwd(), 'dist', 'assets', 'founder.png'), data: pngBuffer },
+];
+
+for (const out of outputs) {
+  const dir = path.dirname(out.path);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(out.path, out.data);
+  console.log(`Saved: ${out.path} (${out.data.length} bytes)`);
+}
+
+console.log('Founder asset generation completed successfully.');

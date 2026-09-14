@@ -20,6 +20,11 @@ import {
 } from 'lucide-react';
 import { ProjectImage } from '../components/ProjectImage';
 import { AboutSection } from '../components/AboutSection';
+import { HeroCarousel } from '../components/HeroCarousel';
+import { ProcessSection } from '../components/ProcessSection';
+import { HeroCarousel } from '../components/HeroCarousel';
+import { ProcessSection } from '../components/ProcessSection';
+import { TargetCustomersSection } from '../components/TargetCustomersSection';
 
 interface HomePageProps {
   services: Service[];
@@ -62,83 +67,8 @@ export const HomePage: React.FC<HomePageProps> = ({
 
   return (
     <div className="pt-20 sm:pt-24 space-y-24 sm:space-y-32">
-      {/* 1. HERO SECTION */}
-      <section className="relative overflow-hidden pt-8 pb-16 sm:pb-24">
-        {/* Ambient atmospheric glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-gradient-to-tr from-sky-500/15 via-blue-600/15 to-indigo-600/10 blur-[130px] rounded-full pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          {/* Varanasi Tech Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-800 text-xs text-slate-300 mb-6 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-            <span className="text-cyan-400 font-semibold uppercase tracking-wider text-[11px]">
-              Varanasi, India
-            </span>
-            <span className="text-slate-500">•</span>
-            <span>Digital Engineering & Web Solutions</span>
-          </div>
-
-          {/* Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white font-['Outfit'] tracking-tight max-w-4xl mx-auto leading-[1.12]">
-            Turning Ideas Into{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-400">
-              Powerful Digital
-            </span>{' '}
-            Experiences.
-          </h1>
-
-          {/* Subtitle */}
-          <p className="mt-6 text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            SrijanTech engineers bespoke, lightning-fast websites, scalable cloud web applications,
-            and seamless Indian UPI e-commerce systems for modern businesses and visionary leaders.
-          </p>
-
-          {/* Hero CTAs */}
-          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button
-              id="hero-start-project-btn"
-              onClick={() => onOpenEnquiry()}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-semibold text-sm shadow-xl shadow-sky-500/25 active:scale-98 transition-all"
-            >
-              <span>Start a Project</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-
-            <button
-              id="hero-explore-services-btn"
-              onClick={() => onNavigate('services')}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 text-slate-200 font-semibold text-sm transition-all"
-            >
-              <span>Explore Services</span>
-              <ChevronRight className="w-4 h-4 text-slate-400" />
-            </button>
-          </div>
-
-          {/* Trust Highlights */}
-          <div className="mt-14 pt-8 border-t border-slate-800/80 grid grid-cols-2 md:grid-cols-4 gap-6 text-left max-w-4xl mx-auto">
-            <div className="p-3 rounded-xl bg-slate-900/40 border border-slate-800/60">
-              <div className="text-xs text-slate-400 uppercase font-semibold">Engineering</div>
-              <div className="text-base font-bold text-white mt-0.5">React + TypeScript</div>
-              <div className="text-[11px] text-slate-400 mt-1">High-reliability frontend</div>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-900/40 border border-slate-800/60">
-              <div className="text-xs text-slate-400 uppercase font-semibold">Payment Flow</div>
-              <div className="text-base font-bold text-cyan-400 mt-0.5">Instant UPI & QR</div>
-              <div className="text-[11px] text-slate-400 mt-1">Zero hassle Indian checkout</div>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-900/40 border border-slate-800/60">
-              <div className="text-xs text-slate-400 uppercase font-semibold">Performance</div>
-              <div className="text-base font-bold text-emerald-400 mt-0.5">&lt; 1s Core Web Vitals</div>
-              <div className="text-[11px] text-slate-400 mt-1">SEO-dominant page speeds</div>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-900/40 border border-slate-800/60">
-              <div className="text-xs text-slate-400 uppercase font-semibold">Local Trust</div>
-              <div className="text-base font-bold text-amber-400 mt-0.5">Varanasi, UP</div>
-              <div className="text-[11px] text-slate-400 mt-1">Direct founder collaboration</div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* 1. HERO SECTION WITH 6-SLIDE CAROUSEL */}
+      <HeroCarousel onOpenEnquiry={onOpenEnquiry} onNavigate={onNavigate} />
 
       {/* 2. SERVICES PREVIEW SECTION */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -278,6 +208,9 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </section>
 
+      {/* TARGET CUSTOMERS SECTION */}
+      <TargetCustomersSection onOpenEnquiry={onOpenEnquiry} onNavigate={onNavigate} />
+
       {/* ABOUT SRIJANTECH & FOUNDER SECTION */}
       <AboutSection
         settings={settings || initialSettings}
@@ -385,57 +318,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       </section>
 
       {/* 5. PROCESS / HOW WE WORK */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 text-cyan-400 text-xs font-semibold uppercase tracking-wider mb-2">
-            <Clock className="w-3.5 h-3.5" />
-            Clear & Transparent
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-['Outfit'] tracking-tight">
-            How We Work
-          </h2>
-          <p className="text-sm text-slate-400 mt-2">
-            A structured, 4-stage engineering lifecycle with zero ambiguity from initial briefing to
-            final delivery.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            {
-              step: '01',
-              title: 'Discover & Scope',
-              desc: 'Detailed discussion of your business objectives, technical requirements, and target timeline.',
-            },
-            {
-              step: '02',
-              title: 'Architectural Blueprint',
-              desc: 'Creating component hierarchies, database schemas, and wireframes for your approval.',
-            },
-            {
-              step: '03',
-              title: 'Precision Build',
-              desc: 'Developing cleanly with TypeScript, automated tests, and regular live preview checkpoints.',
-            },
-            {
-              step: '04',
-              title: 'Deploy & Support',
-              desc: 'Production deployment with domain setup, SSL hardening, and comprehensive maintenance handoff.',
-            },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800/80 relative"
-            >
-              <div className="text-2xl font-extrabold font-['Outfit'] text-cyan-500/40 mb-3">
-                {item.step}
-              </div>
-              <h4 className="text-base font-bold text-white font-['Outfit'] mb-2">{item.title}</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <ProcessSection onOpenEnquiry={() => onOpenEnquiry()} />
 
       {/* 6. PRICING PREVIEW */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -481,16 +364,32 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <p className="text-xs text-slate-400 mt-1">{plan.short_description}</p>
 
                 <div className="mt-6 mb-6">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-xs text-slate-400">Starting from</span>
-                    <span className="text-3xl font-extrabold text-white font-['Outfit']">
-                      ₹{plan.price.toLocaleString('en-IN')}
-                    </span>
-                    <span className="text-xs text-slate-400 font-mono">INR</span>
-                  </div>
-                  <span className="text-[11px] text-cyan-400 block mt-1">
-                    {plan.advance_percentage}% Advance to initiate development
-                  </span>
+                  {plan.price_type === 'custom_quote' ? (
+                    <div>
+                      <span className="text-[10px] uppercase text-slate-400 block font-semibold">
+                        Architecture Scope
+                      </span>
+                      <span className="text-2xl sm:text-3xl font-extrabold text-white font-['Outfit']">
+                        Custom Quote
+                      </span>
+                      <span className="text-[11px] text-cyan-400 block mt-1">
+                        Tailored milestone delivery schedule
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-xs text-slate-400">Starting from</span>
+                        <span className="text-3xl font-extrabold text-white font-['Outfit']">
+                          ₹{plan.price.toLocaleString('en-IN')}+
+                        </span>
+                        <span className="text-xs text-slate-400 font-mono">INR</span>
+                      </div>
+                      <span className="text-[11px] text-cyan-400 block mt-1">
+                        {plan.advance_percentage}% Advance to initiate development
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 <ul className="space-y-2 mb-8 text-xs text-slate-300">
@@ -511,10 +410,16 @@ export const HomePage: React.FC<HomePageProps> = ({
                     : 'bg-slate-800 hover:bg-slate-700 text-slate-200'
                 }`}
               >
-                Choose Plan & Pay Advance
+                {plan.price_type === 'custom_quote' ? 'Request Custom Quote' : 'Choose Plan & Pay Advance'}
               </button>
             </div>
           ))}
+        </div>
+
+        {/* Pricing Scope Notice */}
+        <div className="mt-8 p-4 sm:p-5 rounded-2xl bg-amber-950/20 border border-amber-500/30 text-xs text-amber-200/90 text-center max-w-3xl mx-auto shadow-md">
+          <span className="text-white font-semibold block mb-0.5 font-['Outfit']">Clear Pricing Scope:</span>
+          Final pricing depends on requirements, features, integrations, design, development scope and project complexity. We do not promise fixed final pricing when requirements are unknown.
         </div>
       </section>
 

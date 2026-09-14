@@ -40,7 +40,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
           {/* LEFT COLUMN: Large, Clear, Professional Founder Portrait */}
           <div className="lg:col-span-5 flex flex-col items-center justify-center">
             <FounderPhoto
-              photoUrl={settings.founder_photo_url || '/assets/founder.jpeg'}
+              photoUrl={settings.founder_photo_url || '/images/founder/srijan-singh-founder.jpg'}
               size="xl"
               showUploadControls={true}
             />

@@ -16,16 +16,25 @@ export const FounderPhoto: React.FC<FounderPhotoProps> = ({
   onPhotoChange,
   showUploadControls = true,
 }) => {
-  // Candidate fallback list
-  const fallbackList = ['/assets/founder.jpeg', '/assets/founder.jpg', '/assets/founder.png', '/assets/founder.svg'];
+  // Candidate fallback list prioritizing the permanent asset path requested
+  const fallbackList = [
+    '/images/founder/srijan-singh-founder.jpg',
+    '/images/founder/srijan-singh-founder.png',
+    '/assets/founder.jpg',
+    '/assets/founder.jpeg',
+    '/assets/founder.png',
+    '/assets/founder.svg',
+  ];
   const [candidateIndex, setCandidateIndex] = useState<number>(0);
   const [imgSrc, setImgSrc] = useState<string>(() => {
-    // 1. Check localStorage first for user uploaded real photo
+    // 1. If photoUrl provided and not empty, use it
+    if (photoUrl && photoUrl.trim()) return photoUrl;
+    // 2. Check localStorage for user-uploaded custom photo
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('srijantech_founder_photo');
       if (stored) return stored;
     }
-    return photoUrl || fallbackList[0];
+    return fallbackList[0];
   });
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
@@ -46,6 +55,21 @@ export const FounderPhoto: React.FC<FounderPhotoProps> = ({
       }
     };
     window.addEventListener('founder_photo_updated' as any, handleGlobalUpdate);
+
+    // Auto-sync stored founder photo to server disk if present in localStorage
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('srijantech_founder_photo');
+      if (stored && stored.startsWith('data:image')) {
+        fetch('/api/upload-founder-photo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageBase64: stored }),
+        }).catch(() => {
+          // ignore background sync errors
+        });
+      }
+    }
+
     return () => {
       window.removeEventListener('founder_photo_updated' as any, handleGlobalUpdate);
     };

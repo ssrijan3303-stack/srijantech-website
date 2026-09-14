@@ -3,48 +3,43 @@
   <defs>
     <!-- Background Gradients -->
     <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0b1329" />
-      <stop offset="50%" stop-color="#0f172a" />
-      <stop offset="100%" stop-color="#020617" />
+      <stop offset="0%" stop-color="#050c1e" />
+      <stop offset="50%" stop-color="#0b1736" />
+      <stop offset="100%" stop-color="#020612" />
     </linearGradient>
 
     <!-- Studio Tech Glow -->
-    <radialGradient id="glowBackdrop" cx="50%" cy="38%" r="45%">
-      <stop offset="0%" stop-color="#0284c7" stop-opacity="0.38" />
-      <stop offset="60%" stop-color="#0369a1" stop-opacity="0.12" />
-      <stop offset="100%" stop-color="#0f172a" stop-opacity="0" />
+    <radialGradient id="glowBackdrop" cx="50%" cy="38%" r="48%">
+      <stop offset="0%" stop-color="#0284c7" stop-opacity="0.45" />
+      <stop offset="50%" stop-color="#0369a1" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#0b1736" stop-opacity="0" />
     </radialGradient>
 
     <linearGradient id="suitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1e293b" />
-      <stop offset="50%" stop-color="#0f172a" />
-      <stop offset="100%" stop-color="#090d16" />
+      <stop offset="0%" stop-color="#24324a" />
+      <stop offset="50%" stop-color="#152033" />
+      <stop offset="100%" stop-color="#0b101c" />
     </linearGradient>
 
     <linearGradient id="shirtGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#f8fafc" />
-      <stop offset="100%" stop-color="#cbd5e1" />
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#dbeafe" />
     </linearGradient>
 
     <linearGradient id="tieGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0284c7" />
-      <stop offset="100%" stop-color="#0369a1" />
+      <stop offset="0%" stop-color="#0ea5e9" />
+      <stop offset="100%" stop-color="#0284c7" />
     </linearGradient>
 
     <linearGradient id="skinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#d49a6a" />
-      <stop offset="50%" stop-color="#c58552" />
-      <stop offset="100%" stop-color="#a66a3d" />
+      <stop offset="0%" stop-color="#d99f70" />
+      <stop offset="50%" stop-color="#c68552" />
+      <stop offset="100%" stop-color="#a4683c" />
     </linearGradient>
 
     <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#1e293b" />
       <stop offset="100%" stop-color="#090d16" />
-    </linearGradient>
-
-    <linearGradient id="cyanBadge" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#0ea5e9" />
-      <stop offset="100%" stop-color="#38bdf8" />
     </linearGradient>
 
     <!-- Pattern -->

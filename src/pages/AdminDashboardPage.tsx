@@ -39,6 +39,7 @@ import {
   saveWebsiteSettings,
 } from '../services/db';
 import { InvoiceModal } from '../components/InvoiceModal';
+import { AdminTimeTrackingSection } from '../components/AdminTimeTrackingSection';
 import {
   LayoutDashboard,
   Inbox,
@@ -309,6 +310,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ adminUse
     { id: 'payments', label: `UPI Bank Match (${pendingVerificationCount})`, icon: CreditCard },
     { id: 'services', label: `Services (${services.length})`, icon: Briefcase },
     { id: 'projects', label: `Projects (${projects.length})`, icon: FolderGit2 },
+    { id: 'time-tracking', label: 'Time Tracking & Progress', icon: Clock },
     { id: 'tickets', label: `Support Tickets (${openTicketsCount})`, icon: Headphones },
     { id: 'settings', label: 'Site & Founder Settings', icon: Settings },
   ];
@@ -778,6 +780,11 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ adminUse
             ))}
           </div>
         </div>
+      )}
+
+      {/* TAB: TIME TRACKING & PROGRESS */}
+      {activeTab === 'time-tracking' && (
+        <AdminTimeTrackingSection onShowToast={showToast} />
       )}
 
       {/* TAB 7: SUPPORT TICKETS */}

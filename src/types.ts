@@ -1,14 +1,44 @@
 export type UserRole = 'super_admin' | 'admin' | 'staff' | 'customer';
 
 export type ProjectStatus =
+  | 'inquiry'
   | 'enquiry'
   | 'discussion'
+  | 'planning'
+  | 'design'
+  | 'development'
+  | 'testing'
+  | 'waiting_for_client'
+  | 'completed'
+  | 'maintenance'
   | 'quotation'
   | 'advance_pending'
   | 'in_progress'
   | 'review'
-  | 'completed'
   | 'cancelled';
+
+export interface MilestoneItem {
+  id: string;
+  title: string;
+  status: 'pending' | 'in_progress' | 'completed';
+  due_date?: string;
+  completed_at?: string;
+}
+
+export interface TimeEntry {
+  id: string;
+  project_id: string;
+  project_name: string;
+  customer_email?: string;
+  date: string; // YYYY-MM-DD
+  start_time: string; // HH:MM
+  end_time: string; // HH:MM
+  duration_minutes: number;
+  description: string;
+  entry_type: 'manual'; // Clearly treated as manual entry as requested
+  logged_by: string;
+  created_at: string;
+}
 
 export type PaymentStatus =
   | 'created'
@@ -108,6 +138,14 @@ export interface Project {
   paid_amount: number;
   start_date?: string;
   target_delivery_date?: string;
+  expected_completion?: string;
+  progress_percentage?: number;
+  milestones?: MilestoneItem[];
+  work_summary?: string;
+  customer_email?: string;
+  project_type?: string;
+  last_updated?: string;
+  updated_at?: string;
   created_at: string;
 }
 

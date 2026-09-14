@@ -14,6 +14,7 @@ import {
   WebsiteSettings,
   AuditLog,
   Customer,
+  TimeEntry,
 } from '../types';
 import {
   defaultServices,
@@ -57,6 +58,7 @@ interface DBState {
   notifications: NotificationItem[];
   customers: Customer[];
   auditLogs: AuditLog[];
+  timeEntries: TimeEntry[];
 }
 
 function loadLocalState(): DBState {
@@ -64,6 +66,7 @@ function loadLocalState(): DBState {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
+      if (!parsed.timeEntries) parsed.timeEntries = [];
       // Ensure all projects always have valid, updated thumbnail_url and demo links
       if (parsed.projects && parsed.projects.length > 0) {
         parsed.projects = defaultProjects.map((dp) => {
@@ -197,6 +200,36 @@ function loadLocalState(): DBState {
         entity_id: 'system-init',
         metadata: { info: 'SrijanTech core platform initialized' },
         created_at: new Date().toISOString(),
+      },
+    ],
+    timeEntries: [
+      {
+        id: 'time-101',
+        project_id: 'prj-1',
+        project_name: 'E-Commerce Website',
+        customer_email: 'aditya@vermalogistics.in',
+        date: '2025-01-04',
+        start_time: '10:00',
+        end_time: '14:30',
+        duration_minutes: 270,
+        description: 'Initial shopping cart architecture and UPI QR code generator integration.',
+        entry_type: 'manual',
+        logged_by: 'Srijan Singh (Admin)',
+        created_at: '2025-01-04T15:00:00Z',
+      },
+      {
+        id: 'time-102',
+        project_id: 'prj-1',
+        project_name: 'E-Commerce Website',
+        customer_email: 'aditya@vermalogistics.in',
+        date: '2025-01-05',
+        start_time: '11:00',
+        end_time: '16:00',
+        duration_minutes: 300,
+        description: 'Responsive catalog filters, image optimization, and Indian GST invoice PDF generation.',
+        entry_type: 'manual',
+        logged_by: 'Srijan Singh (Admin)',
+        created_at: '2025-01-05T16:30:00Z',
       },
     ],
   };
@@ -842,3 +875,66 @@ export async function createSupportTicket(data: {
 export async function updateSupportTicket(id: string, status: string, response?: string): Promise<boolean> {
   return replySupportMessage(id, response || '', status as any);
 }
+
+// ----------------- TIME TRACKING -----------------
+export async function getTimeEntries(projectId?: string, customerEmail?: string): Promise<TimeEntry[]> {
+  let list = [...(localState.timeEntries || [])];
+  if (projectId) {
+    list = list.filter((t) => t.project_id === projectId);
+  }
+  if (customerEmail) {
+    list = list.filter((t) => !t.customer_email || t.customer_email.toLowerCase() === customerEmail.toLowerCase());
+  }
+  return list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+}
+
+export async function createTimeEntry(entry: Omit<TimeEntry, 'id' | 'created_at'>): Promise<TimeEntry> {
+  const newEntry: TimeEntry = {
+    ...entry,
+    id: `time-${Date.now()}`,
+    entry_type: 'manual', // Strictly manually entered as requested
+    created_at: new Date().toISOString(),
+  };
+
+  if (!localState.timeEntries) localState.timeEntries = [];
+  localState.timeEntries.unshift(newEntry);
+  saveLocalState();
+  await logAuditAction('srijan@srijantech.in', 'CREATE', 'TIME_ENTRY', newEntry.id, {
+    project: newEntry.project_name,
+    duration: newEntry.duration_minutes,
+  });
+  return newEntry;
+}
+
+export async function deleteTimeEntry(id: string): Promise<boolean> {
+  if (!localState.timeEntries) return false;
+  localState.timeEntries = localState.timeEntries.filter((t) => t.id !== id);
+  saveLocalState();
+  await logAuditAction('srijan@srijantech.in', 'DELETE', 'TIME_ENTRY', id);
+  return true;
+}
+
+export async function updateProjectProgress(
+  projectId: string,
+  updates: Partial<Project>
+): Promise<Project | null> {
+  const idx = localState.projects.findIndex((p) => p.id === projectId);
+  if (idx < 0) return null;
+
+  const current = localState.projects[idx];
+  const updated: Project = {
+    ...current,
+    ...updates,
+    last_updated: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  localState.projects[idx] = updated;
+  saveLocalState();
+  await logAuditAction('srijan@srijantech.in', 'UPDATE_PROJECT_PROGRESS', 'PROJECT', projectId, {
+    status: updated.status,
+    progress: updated.progress_percentage,
+  });
+  return updated;
+}
+
