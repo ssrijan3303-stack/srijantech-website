@@ -15,14 +15,13 @@ export const AdminLoginPage: React.FC = () => {
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
 
-  // Authorized Admin Database with exact registered numbers and credentials
+  // Authorized Admin Database with exact matching records
   const [authorizedAdmins, setAuthorizedAdmins] = useState<{ [key: string]: { phone: string; pass: string } }>({
     'mystoreorder0004@gmail.com': { phone: '9876543210', pass: 'admin123' },
     'srijan@srijantech.in': { phone: '9876543211', pass: 'admin123' },
     'ssrijan3303@gmail.com': { phone: '7269068483', pass: 'admin123' }
   });
 
-  // Timer effect for OTP resend countdown
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (view === 'forgot_otp' && countdown > 0) {
@@ -33,7 +32,6 @@ export const AdminLoginPage: React.FC = () => {
     return () => clearInterval(timer);
   }, [view, countdown]);
 
-  // 1. Handle Regular Admin Login
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -51,7 +49,6 @@ export const AdminLoginPage: React.FC = () => {
     window.location.href = '/admin-dashboard';
   };
 
-  // 2. Handle Step 1: Verify Email and Registered Phone Number
   const handleVerifyEmailPhone = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -81,7 +78,6 @@ export const AdminLoginPage: React.FC = () => {
     }, 1500);
   };
 
-  // 3. Handle Step 2: Verify OTP
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -99,7 +95,6 @@ export const AdminLoginPage: React.FC = () => {
     }, 1200);
   };
 
-  // 4. Handle Step 3: Save New Password
   const handleSaveNewPassword = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -212,7 +207,7 @@ export const AdminLoginPage: React.FC = () => {
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="Enter registered mobile number"
+              placeholder="Enter phone number"
               required
               className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded text-white focus:outline-none focus:border-cyan-500"
             />
