@@ -54,7 +54,8 @@ export const AdminLoginPage: React.FC = () => {
     }
 
     localStorage.setItem('adminToken', 'srijan_secure_super_admin_token');
-    window.location.href = '/#/admin-dashboard';
+    window.location.hash = '#admin-dashboard';
+    window.location.reload();
   };
 
   const handleVerifyEmailPhone = (e: React.FormEvent) => {
