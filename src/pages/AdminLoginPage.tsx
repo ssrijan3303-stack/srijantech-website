@@ -323,3 +323,52 @@ export const AdminLoginPage: React.FC = () => {
     </div>
   );
 };
+
+const handleVerifyEmailPhone = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMsg('');
+
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPhone = phone.trim();
+    const admin = authorizedAdmins[cleanEmail];
+
+    if (!admin) {
+      setError('This email address is not registered as an administrator.');
+      return;
+    }
+
+    if (admin.phone !== cleanPhone) {
+      setError('The phone number does not match our records for this admin email.');
+      return;
+    }
+
+    // Generate random 6 digit OTP or static 123456
+    const generatedOtp = '123456'; 
+
+    try {
+      // Call Vercel Serverless API to trigger real SMS
+      const res = await fetch('/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: cleanPhone, otp: generatedOtp })
+      });
+
+      const result = await res.json();
+      
+      if (res.ok) {
+        setSuccessMsg(`Real-time OTP sent successfully to mobile ending in ****${cleanPhone.slice(-4)}`);
+        setCountdown(60);
+        setCanResend(false);
+
+        setTimeout(() => {
+          setSuccessMsg('');
+          setView('forgot_otp');
+        }, 1500);
+      } else {
+        setError(result.error || 'Failed to dispatch SMS OTP.');
+      }
+    } catch (err) {
+      setError('Network error while sending OTP. Please try again.');
+    }
+  };
