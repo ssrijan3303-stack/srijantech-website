@@ -16,7 +16,6 @@ export const CustomerAuthPage: React.FC = () => {
     setSuccessMsg('');
 
     if (!isLogin) {
-      // Signup Validation
       if (password !== confirmPassword) {
         setError('Passwords do not match. Please re-enter correctly.');
         return;
@@ -26,20 +25,18 @@ export const CustomerAuthPage: React.FC = () => {
         return;
       }
 
-      // Save user details to localStorage to simulate persistent database record
       const newUser = { fullName, phone, email, password };
       localStorage.setItem(`customer_${email}`, JSON.stringify(newUser));
 
       setSuccessMsg('Account created successfully! Please sign in with your credentials.');
       setTimeout(() => {
-        setIsLogin(true); // Switch to Login Page automatically
+        setIsLogin(true);
         setPassword('');
         setConfirmPassword('');
       }, 1500);
       return;
     }
 
-    // Login Validation
     const savedUserData = localStorage.getItem(`customer_${email}`);
     if (savedUserData) {
       const user = JSON.parse(savedUserData);
@@ -50,7 +47,6 @@ export const CustomerAuthPage: React.FC = () => {
       }
     }
 
-    // Fallback/Default test login support for smooth testing
     if (email && password) {
       localStorage.setItem('token', 'customer_secure_session_token');
       window.location.href = '/customer-dashboard';
