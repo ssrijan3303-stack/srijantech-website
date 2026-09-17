@@ -312,7 +312,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ adminUse
       city: newCustCity.trim() || 'Varanasi',
       notes: newCustNotes.trim(),
     });
-
+<div className="min-h-screen bg-slate-950 text-slate-100 pt-20 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8"></div>
     setShowAddCustomerModal(false);
     setNewCustName('');
     setNewCustEmail('');
