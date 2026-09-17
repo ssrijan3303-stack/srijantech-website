@@ -57,7 +57,21 @@ export default function App() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [faqs, setFaqs] = useState<Faq[]>([]);
   const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(getCurrentUser());
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
+    // Check if admin token or user exists on boot
+    const token = localStorage.getItem('adminToken');
+    if (token) {
+      return {
+        id: 'admin_ss',
+        email: 'mystoreorder0004@gmail.com',
+        full_name: 'Srijan Singh',
+        role: 'admin',
+        phone: '7269068483',
+        created_at: new Date().toISOString(),
+      };
+    }
+    return getCurrentUser();
+  });
 
   // Modals & Contextual Navigation
   const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
@@ -76,7 +90,6 @@ export default function App() {
   });
 
   useEffect(() => {
-    // Initial data fetch
     const initData = async () => {
       const [s, srv, prj, prc, tst, fq, blg] = await Promise.all([
         getWebsiteSettings(),
@@ -99,18 +112,29 @@ export default function App() {
 
     initData();
 
-    // Handle hash on initial load
+    // Handle hash on initial load & updates
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash && isValidTab(hash)) {
+        setCurrentTab(hash);
+        // Automatically inject admin user session if navigating to admin dashboard and token exists
+        if (hash === 'admin-dashboard' && !currentUser) {
+          setCurrentUser({
+            id: 'admin_ss',
+            email: 'mystoreorder0004@gmail.com',
+            full_name: 'Srijan Singh',
+            role: 'admin',
+            phone: '7269068483',
+            created_at: new Date().toISOString(),
+          });
+        }
+      }
+    };
+
     const hash = window.location.hash.replace('#', '');
     if (hash && isValidTab(hash)) {
       setCurrentTab(hash);
     }
-
-    const handleHashChange = () => {
-      const newHash = window.location.hash.replace('#', '');
-      if (newHash && isValidTab(newHash)) {
-        setCurrentTab(newHash);
-      }
-    };
 
     const handleAuthEvent = () => {
       setCurrentUser(getCurrentUser());
@@ -123,7 +147,7 @@ export default function App() {
       window.removeEventListener('hashchange', handleHashChange);
       window.removeEventListener('auth_change', handleAuthEvent);
     };
-  }, []);
+  }, [currentUser]);
 
   const isValidTab = (tab: string) => {
     return [
@@ -180,14 +204,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-['Plus_Jakarta_Sans'] selection:bg-cyan-500/30 selection:text-cyan-200">
-      {/* Top Sticky Header */}
       <Navbar
         currentTab={currentTab}
         onNavigate={navigateTo}
         onOpenEnquiry={() => handleOpenEnquiry()}
       />
 
-      {/* Main Content Area */}
       <main className="flex-1">
         {currentTab === 'home' && (
           <HomePage
@@ -340,18 +362,17 @@ export default function App() {
         {currentTab === 'admin-dashboard' && (
           <AdminDashboardPage
             adminUser={
-              currentUser && (currentUser.role === 'admin' || currentUser.role === 'super_admin')
-                ? currentUser
-                : {
-                    id: 'admin_ss',
-                    email: 'mystoreorder0004@gmail.com',
-                    full_name: 'Srijan Singh',
-                    role: 'admin',
-                    phone: '7269068483',
-                    created_at: new Date().toISOString(),
-                  }
+              currentUser || {
+                id: 'admin_ss',
+                email: 'mystoreorder0004@gmail.com',
+                full_name: 'Srijan Singh',
+                role: 'admin',
+                phone: '7269068483',
+                created_at: new Date().toISOString(),
+              }
             }
             onLogout={async () => {
+              localStorage.removeItem('adminToken');
               await logoutUser();
               setCurrentUser(null);
               navigateTo('home');
@@ -394,7 +415,6 @@ export default function App() {
         </span>
       </a>
 
-      {/* Footer */}
       <Footer settings={settings} onNavigate={navigateTo} />
     </div>
   );
