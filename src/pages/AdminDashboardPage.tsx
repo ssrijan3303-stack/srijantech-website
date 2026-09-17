@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 export const CustomerAuthPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -7,7 +6,6 @@ export const CustomerAuthPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +24,7 @@ export const CustomerAuthPage: React.FC = () => {
       const data = await response.json();
       if (data.success || data.authorized) {
         localStorage.setItem('token', data.token || 'customer_secure_session');
-        navigate('/customer-dashboard');
+        window.location.href = '/customer-dashboard';
       } else {
         setError(data.error || 'Authentication failed. Please check your details.');
       }

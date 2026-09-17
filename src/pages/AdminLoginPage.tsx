@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-export const AdminLogin: React.FC = () => {
-  const [email, setEmail] = useState(''); // Hamesha blank rahega
+export const AdminLoginPage: React.FC = () => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +19,7 @@ export const AdminLogin: React.FC = () => {
       const data = await response.json();
       if (data.authorized && data.token) {
         localStorage.setItem('adminToken', data.token);
-        navigate('/admin-dashboard');
+        window.location.href = '/admin-dashboard';
       } else {
         setError(data.error || 'Access denied. Invalid credentials.');
       }
@@ -31,7 +29,7 @@ export const AdminLogin: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-slate-900 rounded-xl shadow-xl border border-slate-800">
+    <div className="max-w-md mx-auto p-6 bg-slate-900 rounded-xl shadow-xl border border-slate-800 my-12">
       <h2 className="text-2xl font-bold text-white mb-6">Admin Panel Authentication</h2>
       
       {error && <div className="mb-4 p-3 bg-red-500/10 border border-red-500 text-red-400 rounded">{error}</div>}
