@@ -1,17 +1,8 @@
-<<<<<<< HEAD
 import React, { useState } from 'react';
 import { loginUser, demoLogin } from '../services/auth';
 import { UserProfile } from '../types';
 import { Logo } from '../components/Logo';
-import {
-  ShieldCheck,
-  Lock,
-  Mail,
-  ArrowRight,
-  AlertCircle,
-  KeyRound,
-  Sparkles,
-} from 'lucide-react';
+import { Mail, Lock, ShieldCheck, ArrowRight, AlertCircle, Sparkles } from 'lucide-react';
 
 interface AdminLoginPageProps {
   onSuccess: (user: UserProfile) => void;
@@ -19,35 +10,46 @@ interface AdminLoginPageProps {
 }
 
 export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onSuccess, onNavigate }) => {
-  const [email, setEmail] = useState('mystoreorder0004@gmail.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
-    setLoading(true);
 
+    if (!email.trim() || !password) {
+      setErrorMsg('Please enter both admin email and password.');
+      return;
+    }
+
+    setLoading(true);
     try {
       const user = await loginUser(email.trim(), password);
       if (user.role !== 'admin' && user.role !== 'super_admin') {
-        throw new Error('Access denied. This account does not possess administrative privileges.');
+        throw new Error('Access denied. Administrator privileges required.');
       }
+      localStorage.setItem('adminToken', 'admin_session_active');
       onSuccess(user);
+      onNavigate('admin-dashboard');
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Authentication failed.';
-      setErrorMsg(message);
+      setErrorMsg(err instanceof Error ? err.message : 'Admin authentication failed.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDemoAdmin = async () => {
+    setErrorMsg('');
     setLoading(true);
     try {
       const user = await demoLogin('admin');
+      localStorage.setItem('adminToken', 'admin_session_active');
       onSuccess(user);
+      onNavigate('admin-dashboard');
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Demo admin login failed.');
     } finally {
       setLoading(false);
     }
@@ -59,41 +61,39 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onSuccess, onNav
         <div className="flex justify-center">
           <Logo size="md" />
         </div>
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold uppercase tracking-wider">
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>SrijanTech Control Room</span>
-        </div>
-        <h1 className="text-2xl font-bold text-white font-['Outfit']">Admin Panel Authentication</h1>
+        <h1 className="text-2xl font-bold text-white font-['Outfit'] flex items-center justify-center gap-2">
+          <ShieldCheck className="w-6 h-6 text-amber-400" />
+          <span>Executive Admin Portal</span>
+        </h1>
         <p className="text-xs text-slate-400">
-          Executive access for Srijan Singh (Varanasi, UP) to manage CRM, invoices, UPI reconciliation, and site settings.
+          Restricted access for Srijan Singh / Executive Management only.
         </p>
       </div>
 
       <div className="p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl space-y-6">
-        {/* Quick Admin Demo Access Button */}
         <button
           type="button"
           onClick={handleDemoAdmin}
-          className="w-full py-2.5 px-4 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
+          className="w-full py-2.5 px-4 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
         >
           <Sparkles className="w-3.5 h-3.5" />
-          <span>One-Click Founder / Admin Login (Srijan Singh)</span>
+          <span>One-Click Verified Admin Login (Srijan Singh)</span>
         </button>
 
-        <div className="flex items-center gap-2 text-xs text-slate-400">
+        <div className="flex items-center gap-2 text-xs text-slate-500">
           <div className="h-px bg-slate-800 flex-1" />
-          <span>or enter credentials</span>
+          <span>or sign in with credentials</span>
           <div className="h-px bg-slate-800 flex-1" />
         </div>
 
         {errorMsg && (
-          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+          <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleAdminLogin} className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1">Admin Email</label>
             <div className="relative">
@@ -110,7 +110,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onSuccess, onNav
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Password</label>
+            <label className="block text-xs font-medium text-slate-300 mb-1">Secure Password</label>
             <div className="relative">
               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
               <input
@@ -127,369 +127,29 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onSuccess, onNav
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-bold shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 disabled:opacity-50 text-slate-950 text-xs font-bold shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2"
           >
             {loading ? (
-              <span>Verifying Privileges...</span>
+              <span>Authenticating Admin...</span>
             ) : (
               <>
-                <span>Enter Admin Panel</span>
+                <span>Access Management Console</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </>
             )}
           </button>
         </form>
 
-        <div className="pt-2 text-center text-xs text-slate-400">
+        <div className="pt-2 text-center text-xs">
           <button
             type="button"
             onClick={() => onNavigate('customer-auth')}
-            className="text-cyan-400 hover:underline"
+            className="text-slate-400 hover:text-cyan-400 transition-colors"
           >
-            Looking for Customer Portal instead?
+            &larr; Back to Customer Portal
           </button>
         </div>
       </div>
     </div>
   );
 };
-=======
-import React, { useState, useEffect } from 'react';
-
-export const AdminLoginPage: React.FC = () => {
-  const [view, setView] = useState<'login' | 'forgot_email' | 'forgot_otp' | 'forgot_new_password'>('login');
-  
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmNewPassword, setConfirmNewPassword] = useState('');
-  
-  const [error, setError] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
-  const [countdown, setCountdown] = useState(60);
-  const [canResend, setCanResend] = useState(false);
-
-  // Load saved admin database from localStorage or use defaults
-  const getStoredAdmins = () => {
-    const saved = localStorage.getItem('srijan_admin_database');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) { /* fallback */ }
-    }
-    return {
-      'mystoreorder0004@gmail.com': { phone: '9876543210', pass: 'admin123' },
-      'srijan@srijantech.in': { phone: '9876543211', pass: 'admin123' },
-      'ssrijan3303@gmail.com': { phone: '7269068483', pass: 'admin123' }
-    };
-  };
-
-  const [authorizedAdmins, setAuthorizedAdmins] = useState(getStoredAdmins);
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (view === 'forgot_otp' && countdown > 0) {
-      timer = setInterval(() => setCountdown(prev => prev - 1), 1000);
-    } else if (countdown === 0) {
-      setCanResend(true);
-    }
-    return () => clearInterval(timer);
-  }, [view, countdown]);
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccessMsg('');
-
-    const cleanEmail = email.trim().toLowerCase();
-    const admin = authorizedAdmins[cleanEmail];
-
-    if (!admin || admin.pass !== password) {
-      setError('Access denied. Invalid admin email or password.');
-      return;
-    }
-
-    localStorage.setItem('adminToken', 'srijan_secure_super_admin_token');
-    window.location.hash = '#admin-dashboard';
-    window.location.reload();
-  };
-
-  const handleVerifyEmailPhone = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccessMsg('');
-
-    const cleanEmail = email.trim().toLowerCase();
-    const cleanPhone = phone.trim();
-    const admin = authorizedAdmins[cleanEmail];
-
-    if (!admin) {
-      setError('This email address is not registered as an administrator.');
-      return;
-    }
-
-    if (admin.phone !== cleanPhone) {
-      setError('The phone number does not match our records for this admin email.');
-      return;
-    }
-
-    // Instant foolproof OTP generation for testing & live preview
-    setSuccessMsg(`OTP sent successfully to mobile ending in ****${cleanPhone.slice(-4)} (Testing OTP: 123456)`);
-    setCountdown(60);
-    setCanResend(false);
-
-    setTimeout(() => {
-      setSuccessMsg('');
-      setView('forgot_otp');
-    }, 1500);
-  };
-
-  const handleVerifyOtp = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccessMsg('');
-
-    if (otp.trim() !== '123456') {
-      setError('Invalid OTP code. Please enter the correct 6-digit code (Hint: 123456).');
-      return;
-    }
-
-    setSuccessMsg('OTP verified successfully! Please set your new password.');
-    setTimeout(() => {
-      setSuccessMsg('');
-      setView('forgot_new_password');
-    }, 1200);
-  };
-
-  const handleSaveNewPassword = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccessMsg('');
-
-    if (newPassword !== confirmNewPassword) {
-      setError('New passwords do not match.');
-      return;
-    }
-    if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters long.');
-      return;
-    }
-
-    const cleanEmail = email.trim().toLowerCase();
-    const updatedAdmins = {
-      ...authorizedAdmins,
-      [cleanEmail]: { ...authorizedAdmins[cleanEmail], pass: newPassword }
-    };
-
-    setAuthorizedAdmins(updatedAdmins);
-    localStorage.setItem('srijan_admin_database', JSON.stringify(updatedAdmins));
-
-    setSuccessMsg('Password updated successfully! Redirecting to login...');
-    setTimeout(() => {
-      setView('login');
-      setPassword('');
-      setNewPassword('');
-      setConfirmNewPassword('');
-      setSuccessMsg('');
-    }, 1500);
-  };
-
-  return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full p-8 bg-slate-900/90 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-800">
-        <h2 className="text-2xl font-bold text-white mb-6 text-center">
-          {view === 'login' && 'Admin Panel Authentication'}
-          {view === 'forgot_email' && 'Admin Recovery: Step 1'}
-          {view === 'forgot_otp' && 'Admin Recovery: Step 2 (SMS OTP)'}
-          {view === 'forgot_new_password' && 'Admin Recovery: Step 3 (Reset Password)'}
-        </h2>
-        
-        {error && <div className="mb-4 p-3 bg-red-500/10 border border-red-500 text-red-400 rounded text-sm">{error}</div>}
-        {successMsg && <div className="mb-4 p-3 bg-green-500/10 border border-green-500 text-green-400 rounded text-sm">{successMsg}</div>}
-
-        {/* VIEW 1: LOGIN */}
-        {view === 'login' && (
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-sm text-slate-300 mb-1">Admin Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter admin email"
-                required
-                className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm text-slate-300 mb-1">Password / Secret Key</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
-                required
-                className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition"
-              />
-            </div>
-
-            <div className="text-right">
-              <button
-                type="button"
-                onClick={() => { setView('forgot_email'); setError(''); setSuccessMsg(''); }}
-                className="text-xs text-cyan-400 hover:underline focus:outline-none"
-              >
-                Forgot Password?
-              </button>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold rounded-lg shadow-lg hover:opacity-90 transition"
-            >
-              Enter Admin Panel
-            </button>
-          </form>
-        )}
-
-        {/* VIEW 2: FORGOT PASSWORD - STEP 1 */}
-        {view === 'forgot_email' && (
-          <form onSubmit={handleVerifyEmailPhone} className="space-y-4">
-            <p className="text-sm text-slate-400 mb-2">Enter your authorized admin email and registered mobile number to receive an SMS OTP.</p>
-            <div>
-              <label className="block text-sm text-slate-300 mb-1">Admin Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter admin email"
-                required
-                className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm text-slate-300 mb-1">Registered Phone Number</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Enter registered mobile number"
-                required
-                className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-lg shadow-lg hover:opacity-90 transition"
-            >
-              Send SMS OTP
-            </button>
-
-            <div className="text-center mt-3">
-              <button
-                type="button"
-                onClick={() => { setView('login'); setError(''); setSuccessMsg(''); }}
-                className="text-xs text-slate-400 hover:text-white underline"
-              >
-                Back to Login
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* VIEW 3: FORGOT PASSWORD - STEP 2 */}
-        {view === 'forgot_otp' && (
-          <form onSubmit={handleVerifyOtp} className="space-y-4">
-            <p className="text-sm text-slate-400 mb-2">
-              Enter the 6-digit OTP sent to your registered mobile number. <br />
-              <span className="text-cyan-400 font-semibold">(Testing OTP: 123456)</span>
-            </p>
-            <div>
-              <label className="block text-sm text-slate-300 mb-1">Enter 6-Digit OTP</label>
-              <input
-                type="text"
-                maxLength={6}
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder="123456"
-                required
-                className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white text-center tracking-widest text-lg focus:outline-none focus:border-cyan-500 transition"
-              />
-            </div>
-
-            <div className="flex justify-between items-center text-xs text-slate-400">
-              <span>Resend OTP in {countdown}s</span>
-              {canResend && (
-                <button
-                  type="button"
-                  onClick={() => { setCountdown(60); setCanResend(false); alert('New OTP sent to your registered mobile!'); }}
-                  className="text-cyan-400 hover:underline"
-                >
-                  Resend OTP
-                </button>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-lg shadow-lg hover:opacity-90 transition"
-            >
-              Verify OTP
-            </button>
-
-            <div className="text-center mt-3">
-              <button
-                type="button"
-                onClick={() => { setView('forgot_email'); setError(''); setSuccessMsg(''); }}
-                className="text-xs text-slate-400 hover:text-white underline"
-              >
-                Change Email/Phone
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* VIEW 4: FORGOT PASSWORD - STEP 3 */}
-        {view === 'forgot_new_password' && (
-          <form onSubmit={handleSaveNewPassword} className="space-y-4">
-            <p className="text-sm text-slate-400 mb-2">Create a secure new password for your administrator account.</p>
-            <div>
-              <label className="block text-sm text-slate-300 mb-1">New Password</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter new password"
-                required
-                className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm text-slate-300 mb-1">Confirm New Password</label>
-              <input
-                type="password"
-                value={confirmNewPassword}
-                onChange={(e) => setConfirmNewPassword(e.target.value)}
-                placeholder="Re-enter new password"
-                required
-                className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold rounded-lg shadow-lg hover:opacity-90 transition"
-            >
-              Reset Password & Login
-            </button>
-          </form>
-        )}
-      </div>
-    </div>
-  );
-};
->>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
