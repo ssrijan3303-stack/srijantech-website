@@ -5,6 +5,7 @@ export const AdminLoginPage: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -14,6 +15,11 @@ export const AdminLoginPage: React.FC = () => {
     } else {
       setError('Please enter valid admin credentials.');
     }
+  };
+
+  const handleForgotPassword = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMessage('Password reset instructions have been sent to your registered admin contact.');
   };
 
   return (
@@ -33,6 +39,12 @@ export const AdminLoginPage: React.FC = () => {
         {error && (
           <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm text-center">
             {error}
+          </div>
+        )}
+
+        {message && (
+          <div className="mb-4 p-3 bg-sky-500/10 border border-sky-500/30 rounded-lg text-sky-400 text-sm text-center">
+            {message}
           </div>
         )}
 
@@ -57,9 +69,18 @@ export const AdminLoginPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-              Password *
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                Password *
+              </label>
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                className="text-xs text-sky-400 hover:underline font-medium focus:outline-none"
+              >
+                Forgot Password?
+              </button>
+            </div>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
                 <Lock className="w-4 h-4" />
