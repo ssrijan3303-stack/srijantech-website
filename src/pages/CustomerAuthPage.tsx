@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-<<<<<<< HEAD
 import {
   loginUser,
   registerUser,
@@ -23,7 +22,6 @@ import {
   Sparkles,
   KeyRound,
   CheckCircle2,
-  HelpCircle,
   Eye,
   EyeOff,
 } from 'lucide-react';
@@ -135,7 +133,7 @@ export const CustomerAuthPage: React.FC<CustomerAuthPageProps> = ({ onSuccess, o
     try {
       const result = await requestPasswordReset(email.trim());
       setSuccessMsg(result.message);
-      setResetToken(result.token); // Auto-fill token for seamless UX
+      setResetToken(result.token);
       setMode('reset_password');
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'Could not process password reset.');
@@ -180,68 +178,11 @@ export const CustomerAuthPage: React.FC<CustomerAuthPageProps> = ({ onSuccess, o
       onSuccess(user);
     } finally {
       setLoading(false);
-=======
-
-export const CustomerAuthPage: React.FC = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccessMsg('');
-
-    if (!isLogin) {
-      if (password !== confirmPassword) {
-        setError('Passwords do not match. Please re-enter correctly.');
-        return;
-      }
-      if (password.length < 6) {
-        setError('Password must be at least 6 characters long.');
-        return;
-      }
-
-      const newUser = { fullName, phone, email, password };
-      localStorage.setItem(`customer_${email}`, JSON.stringify(newUser));
-
-      setSuccessMsg('Account created successfully! Please sign in with your credentials.');
-      setTimeout(() => {
-        setIsLogin(true);
-        setPassword('');
-        setConfirmPassword('');
-      }, 1500);
-      return;
-    }
-
-    const savedUserData = localStorage.getItem(`customer_${email}`);
-    if (savedUserData) {
-      const user = JSON.parse(savedUserData);
-      if (user.password === password) {
-        localStorage.setItem('token', 'customer_secure_session_token');
-        window.location.href = '/customer-dashboard';
-        return;
-      }
-    }
-
-    if (email && password) {
-      localStorage.setItem('token', 'customer_secure_session_token');
-      window.location.href = '/customer-dashboard';
-    } else {
-      setError('Invalid email or password. Please try again.');
->>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
     }
   };
 
   return (
-<<<<<<< HEAD
     <div className="pt-28 pb-20 max-w-md mx-auto px-4 sm:px-6 space-y-6">
-      {/* Header */}
       <div className="text-center space-y-2">
         <div className="flex justify-center">
           <Logo size="md" />
@@ -265,63 +206,25 @@ export const CustomerAuthPage: React.FC = () => {
       </div>
 
       <div className="p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl space-y-6">
-        {/* Quick Demo Fill Button (only on login/signup) */}
         {(mode === 'login' || mode === 'signup') && (
           <>
             <button
               type="button"
               onClick={handleDemoCustomer}
-              className="w-full py-2.5 px-4 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
+              className="w-full py-2.5 px-4 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>One-Click Verified Demo Customer Login (Aditya Verma)</span>
+              <span>One-Click Verified Demo Customer Login</span>
             </button>
 
             <div className="flex items-center gap-2 text-xs text-slate-500">
               <div className="h-px bg-slate-800 flex-1" />
               <span>or authenticate securely</span>
               <div className="h-px bg-slate-800 flex-1" />
-=======
-    <div className="max-w-md mx-auto p-6 bg-slate-900 rounded-xl shadow-xl border border-slate-800 my-12">
-      <h2 className="text-2xl font-bold text-white mb-6">
-        {isLogin ? 'Customer Login' : 'Create Customer Account'}
-      </h2>
-      
-      {error && <div className="mb-4 p-3 bg-red-500/10 border border-red-500 text-red-400 rounded text-sm">{error}</div>}
-      {successMsg && <div className="mb-4 p-3 bg-green-500/10 border border-green-500 text-green-400 rounded text-sm">{successMsg}</div>}
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {!isLogin && (
-          <>
-            <div>
-              <label className="block text-sm text-slate-300 mb-1">Full Name</label>
-              <input
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Enter your full name"
-                required
-                className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded text-white focus:outline-none focus:border-cyan-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm text-slate-300 mb-1">Phone Number</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Enter your phone number"
-                required
-                className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded text-white focus:outline-none focus:border-cyan-500"
-              />
->>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
             </div>
           </>
         )}
 
-<<<<<<< HEAD
-        {/* Feedback Messages */}
         {errorMsg && (
           <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
@@ -336,7 +239,6 @@ export const CustomerAuthPage: React.FC = () => {
           </div>
         )}
 
-        {/* MODE 1: LOGIN */}
         {mode === 'login' && (
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
@@ -348,7 +250,6 @@ export const CustomerAuthPage: React.FC = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="customer@example.com"
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
                 />
               </div>
@@ -375,7 +276,6 @@ export const CustomerAuthPage: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
                   className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
                 />
                 <button
@@ -405,7 +305,6 @@ export const CustomerAuthPage: React.FC = () => {
           </form>
         )}
 
-        {/* MODE 2: SIGNUP */}
         {mode === 'signup' && (
           <form onSubmit={handleSignup} className="space-y-4">
             <div>
@@ -417,7 +316,6 @@ export const CustomerAuthPage: React.FC = () => {
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Rahul Sharma"
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
                 />
               </div>
@@ -432,7 +330,6 @@ export const CustomerAuthPage: React.FC = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="rahul@example.com"
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
                 />
               </div>
@@ -447,16 +344,13 @@ export const CustomerAuthPage: React.FC = () => {
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="9839000000"
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                Password (min. 8 characters, letters &amp; numbers) *
-              </label>
+              <label className="block text-xs font-medium text-slate-300 mb-1">Password *</label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <input
@@ -464,7 +358,6 @@ export const CustomerAuthPage: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
                   className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
                 />
                 <button
@@ -486,13 +379,9 @@ export const CustomerAuthPage: React.FC = () => {
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
                 />
               </div>
-              {confirmPassword && password !== confirmPassword && (
-                <span className="text-[11px] text-rose-400 mt-1 block">Passwords do not match</span>
-              )}
             </div>
 
             <button
@@ -512,15 +401,11 @@ export const CustomerAuthPage: React.FC = () => {
           </form>
         )}
 
-        {/* MODE 3: FORGOT PASSWORD */}
         {mode === 'forgot_password' && (
           <form onSubmit={handleForgotPassword} className="space-y-4">
             <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-slate-400 flex items-start gap-2">
               <KeyRound className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-              <span>
-                Enter your account email. We will generate a secure 6-digit verification code to reset
-                your password.
-              </span>
+              <span>Enter your account email to receive a secure verification code.</span>
             </div>
 
             <div>
@@ -532,7 +417,6 @@ export const CustomerAuthPage: React.FC = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="customer@example.com"
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
                 />
               </div>
@@ -543,103 +427,61 @@ export const CustomerAuthPage: React.FC = () => {
               disabled={loading}
               className="w-full py-3 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              {loading ? (
-                <span>Sending Code...</span>
-              ) : (
-                <>
-                  <span>Send Verification Code</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </>
-              )}
+              {loading ? <span>Sending Code...</span> : <span>Send Verification Code</span>}
             </button>
           </form>
         )}
 
-        {/* MODE 4: RESET PASSWORD */}
         {mode === 'reset_password' && (
           <form onSubmit={handleResetPassword} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                6-Digit Verification Code
-              </label>
-              <div className="relative">
-                <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="text"
-                  required
-                  value={resetToken}
-                  onChange={(e) => setResetToken(e.target.value)}
-                  placeholder="e.g. 123456"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-white focus:outline-none focus:border-cyan-500 transition-colors tracking-wider"
-                />
-              </div>
+              <label className="block text-xs font-medium text-slate-300 mb-1">6-Digit Code</label>
+              <input
+                type="text"
+                required
+                value={resetToken}
+                onChange={(e) => setResetToken(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-white focus:outline-none focus:border-cyan-500"
+              />
             </div>
 
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1">New Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500"
+              />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                Confirm New Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-              </div>
+              <label className="block text-xs font-medium text-slate-300 mb-1">Confirm Password</label>
+              <input
+                type="password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500"
+              />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition-all"
             >
-              {loading ? (
-                <span>Resetting Password...</span>
-              ) : (
-                <>
-                  <span>Save New Password &amp; Login</span>
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                </>
-              )}
+              Save New Password &amp; Login
             </button>
           </form>
         )}
 
-        {/* Footer Navigation */}
         <div className="pt-2 text-center text-xs text-slate-400 space-y-3">
           {mode === 'login' && (
             <button
               type="button"
-              onClick={() => {
-                clearMessages();
-                setMode('signup');
-              }}
+              onClick={() => { clearMessages(); setMode('signup'); }}
               className="text-cyan-400 hover:underline"
             >
               Don't have an account? Create one
@@ -649,10 +491,7 @@ export const CustomerAuthPage: React.FC = () => {
           {mode === 'signup' && (
             <button
               type="button"
-              onClick={() => {
-                clearMessages();
-                setMode('login');
-              }}
+              onClick={() => { clearMessages(); setMode('login'); }}
               className="text-cyan-400 hover:underline"
             >
               Already registered? Sign in here
@@ -662,10 +501,7 @@ export const CustomerAuthPage: React.FC = () => {
           {(mode === 'forgot_password' || mode === 'reset_password') && (
             <button
               type="button"
-              onClick={() => {
-                clearMessages();
-                setMode('login');
-              }}
+              onClick={() => { clearMessages(); setMode('login'); }}
               className="text-cyan-400 hover:underline"
             >
               Return to Sign In
@@ -687,63 +523,3 @@ export const CustomerAuthPage: React.FC = () => {
     </div>
   );
 };
-=======
-        <div>
-          <label className="block text-sm text-slate-300 mb-1">Email Address</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email address"
-            required
-            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded text-white focus:outline-none focus:border-cyan-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm text-slate-300 mb-1">Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
-            required
-            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded text-white focus:outline-none focus:border-cyan-500"
-          />
-        </div>
-
-        {!isLogin && (
-          <div>
-            <label className="block text-sm text-slate-300 mb-1">Re-enter Password</label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Re-enter your password"
-              required
-              className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded text-white focus:outline-none focus:border-cyan-500"
-            />
-          </div>
-        )}
-
-        <button
-          type="submit"
-          className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded shadow hover:opacity-90 transition"
-        >
-          {isLogin ? 'Sign In' : 'Register Account'}
-        </button>
-      </form>
-
-      <div className="mt-4 text-center">
-        <button
-          type="button"
-          onClick={() => { setIsLogin(!isLogin); setError(''); setSuccessMsg(''); }}
-          className="text-sm text-cyan-400 hover:underline focus:outline-none"
-        >
-          {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
-        </button>
-      </div>
-    </div>
-  );
-};
->>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
