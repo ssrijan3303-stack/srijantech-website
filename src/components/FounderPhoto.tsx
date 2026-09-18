@@ -103,11 +103,7 @@ export const FounderPhoto: React.FC<FounderPhotoProps> = ({
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-<<<<<<< HEAD
             Authorization: `Bearer ${adminToken}`,
-=======
-            Authorization: `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token') || localStorage.getItem('authToken') || adminToken}`,
->>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
           },
           body: JSON.stringify({ imageBase64: base64Data }),
         });
@@ -175,7 +171,7 @@ export const FounderPhoto: React.FC<FounderPhotoProps> = ({
           loading="eager"
         />
 
-        {/* Small Badge: "Founder & Director" (as explicitly specified) */}
+        {/* Small Badge: "Founder & Director" */}
         <div className="absolute bottom-4 left-4 right-4 bg-slate-950/90 backdrop-blur-md border border-cyan-500/30 px-3.5 py-2.5 rounded-2xl shadow-xl flex items-center justify-between pointer-events-none">
           <div className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/80 animate-pulse" />
@@ -208,7 +204,7 @@ export const FounderPhoto: React.FC<FounderPhotoProps> = ({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
-              title="Click to select/update your real founder photo (photo offical.jpeg)"
+              title="Click to select/update your real founder photo"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-950/90 hover:bg-cyan-500 hover:text-slate-950 border border-cyan-500/40 text-cyan-300 text-xs font-semibold backdrop-blur-md shadow-lg transition-all cursor-pointer opacity-90 group-hover:opacity-100"
             >
               {isUploading ? (
