@@ -29,7 +29,6 @@ export const initialSettings: WebsiteSettings = {
   city: 'Varanasi',
   state: 'Uttar Pradesh',
   country: 'India',
-  country: 'India',
   social_links: [
     { platform: 'LinkedIn', url: '', is_active: false },
     { platform: 'GitHub', url: '', is_active: false },
