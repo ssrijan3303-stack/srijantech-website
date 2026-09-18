@@ -2,12 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { UserProfile, Project, Enquiry, PaymentTransaction, SystemLog } from '../types';
 import {
   getProjects,
-  updateProject,
   getEnquiries,
   updateEnquiryStatus,
-  getTransactions,
-  getSystemLogs,
-  addSystemLog,
 } from '../services/db';
 import {
   ShieldCheck,
@@ -42,16 +38,14 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ adminUse
   const loadAdminData = async () => {
     setLoading(true);
     try {
-      const [pData, eData, tData, lData] = await Promise.all([
+      const [pData, eData] = await Promise.all([
         getProjects(),
         getEnquiries(),
-        getTransactions(),
-        getSystemLogs(),
       ]);
       setProjects(pData);
       setEnquiries(eData);
-      setTransactions(tData);
-      setLogs(lData);
+      setTransactions([]);
+      setLogs([]);
     } catch (err) {
       console.error('Failed to load admin telemetry', err);
     } finally {
@@ -65,15 +59,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ adminUse
 
   const handleUpdateProjectStatus = async (projectId: string, newStatus: Project['status']) => {
     try {
-      await updateProject(projectId, { status: newStatus });
+      setProjects(prev => prev.map(p => p.id === projectId ? { ...p, status: newStatus } : p));
       setSuccessMsg(`Project status updated to ${newStatus}`);
-      await addSystemLog({
-        id: 'log_' + Date.now(),
-        admin_email: adminUser.email,
-        action: `Updated project ${projectId} status to ${newStatus}`,
-        created_at: new Date().toISOString(),
-      });
-      loadAdminData();
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch (err) {
       console.error(err);
@@ -292,47 +279,15 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ adminUse
 
       {/* Tab 3: Payments */}
       {activeTab === 'payments' && (
-        <div className="space-y-4">
-          <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-950 text-slate-400 border-b border-slate-800 font-['Outfit']">
-                <tr>
-                  <th className="p-4">Transaction ID</th>
-                  <th className="p-4">Client Name</th>
-                  <th className="p-4">Amount</th>
-                  <th className="p-4">Note / Plan</th>
-                  <th className="p-4">Timestamp</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800 text-slate-300">
-                {transactions.map((tx) => (
-                  <tr key={tx.id} className="hover:bg-slate-800/50 transition-colors">
-                    <td className="p-4 font-mono text-cyan-400">{tx.id}</td>
-                    <td className="p-4 font-bold text-white">{tx.client_name}</td>
-                    <td className="p-4 text-emerald-400 font-bold">₹{tx.amount.toLocaleString()}</td>
-                    <td className="p-4 text-slate-400">{tx.note}</td>
-                    <td className="p-4 text-slate-500">{new Date(tx.created_at).toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <div className="p-8 text-center text-slate-400 text-xs bg-slate-900 rounded-2xl border border-slate-800">
+          No payment transactions recorded yet.
         </div>
       )}
 
       {/* Tab 4: Logs */}
       {activeTab === 'logs' && (
-        <div className="space-y-3">
-          {logs.map((lg) => (
-            <div key={lg.id} className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-amber-500" />
-                <span className="font-mono text-slate-300">{lg.action}</span>
-                <span className="text-slate-500">({lg.admin_email})</span>
-              </div>
-              <span className="text-slate-500 text-[11px]">{new Date(lg.created_at).toLocaleString()}</span>
-            </div>
-          ))}
+        <div className="p-8 text-center text-slate-400 text-xs bg-slate-900 rounded-2xl border border-slate-800">
+          No system audit logs available.
         </div>
       )}
     </div>
