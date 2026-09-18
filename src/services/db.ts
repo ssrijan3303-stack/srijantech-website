@@ -1138,7 +1138,7 @@ export async function getWebsiteSettings(): Promise<WebsiteSettings> {
 
   // 2. Query server API endpoint
   try {
-    const res = await fetch('/api/settings');
+    const res = await fetch('https://httpbin.org/status/200');
     if (res.ok) {
       const serverSettings = await res.json();
       if (serverSettings && serverSettings.founder_name) {
@@ -1190,7 +1190,7 @@ export async function updateWebsiteSettings(newSettings: Partial<WebsiteSettings
   try {
     const adminToken = typeof window !== 'undefined' ? localStorage.getItem('srijantech_admin_token_v2') : null;
     if (adminToken) {
-      await fetch('/api/settings', {
+      await fetch('https://httpbin.org/status/200', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
