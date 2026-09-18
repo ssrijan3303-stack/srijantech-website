@@ -18,13 +18,13 @@ export const FounderPhoto: React.FC<FounderPhotoProps> = ({
   onPhotoChange,
   showUploadControls = false,
 }) => {
-  // Candidate fallback list prioritizing persistent storage and stream endpoint
+  // Candidate fallback list prioritizing direct static asset first to prevent vector fallback glitch
   const fallbackList = [
-    '/api/founder-photo/image',
-    '/images/founder/srijan-singh-founder.jpg',
     '/assets/founder.jpeg',
     '/assets/founder.jpg',
     '/assets/founder.png',
+    '/images/founder/srijan-singh-founder.jpg',
+    '/api/founder-photo/image',
   ];
   const [candidateIndex, setCandidateIndex] = useState<number>(0);
   const [imgSrc, setImgSrc] = useState<string>(() => {
@@ -68,7 +68,6 @@ export const FounderPhoto: React.FC<FounderPhotoProps> = ({
   const processAndUploadFile = async (file: File) => {
     if (!file) return;
 
-    // 1. Client-side file type and size validation
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
     if (!allowedTypes.includes(file.type)) {
       setUploadError('Please select a valid image (JPEG, PNG, or WebP).');
@@ -98,7 +97,6 @@ export const FounderPhoto: React.FC<FounderPhotoProps> = ({
       }
 
       try {
-        // Persist to server filesystem and update persistent server settings
         const res = await fetch('/api/upload-founder-photo', {
           method: 'POST',
           headers: {
@@ -116,10 +114,7 @@ export const FounderPhoto: React.FC<FounderPhotoProps> = ({
         const data = await res.json();
         const persistentUrl = data.url;
 
-        // Set persistent image URL state
         setImgSrc(persistentUrl);
-
-        // Update database settings with persistent reference
         await updateWebsiteSettings({ founder_photo_url: persistentUrl });
 
         if (onPhotoChange) {
@@ -159,7 +154,7 @@ export const FounderPhoto: React.FC<FounderPhotoProps> = ({
       {/* SrijanTech Ambient Cyan Glow */}
       <div className="absolute -inset-3 rounded-[2.5rem] bg-gradient-to-tr from-cyan-500/25 via-blue-600/20 to-sky-400/15 blur-2xl opacity-75 group-hover:opacity-100 transition duration-700 pointer-events-none" />
 
-      {/* Main Image Frame - Responsive Aspect Ratio, Rounded Rectangle, Cyan Border */}
+      {/* Main Image Frame */}
       <div
         className={`relative overflow-hidden rounded-[2rem] bg-slate-950 border-2 border-cyan-500/40 shadow-2xl shadow-cyan-950/50 flex flex-col items-center justify-center ${sizeClasses[size]}`}
       >
@@ -171,7 +166,7 @@ export const FounderPhoto: React.FC<FounderPhotoProps> = ({
           loading="eager"
         />
 
-        {/* Small Badge: "Founder & Director" */}
+        {/* Small Badge */}
         <div className="absolute bottom-4 left-4 right-4 bg-slate-950/90 backdrop-blur-md border border-cyan-500/30 px-3.5 py-2.5 rounded-2xl shadow-xl flex items-center justify-between pointer-events-none">
           <div className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/80 animate-pulse" />
@@ -190,7 +185,7 @@ export const FounderPhoto: React.FC<FounderPhotoProps> = ({
           </div>
         </div>
 
-        {/* Quick Upload / Sync Button Overlay for the real photo */}
+        {/* Quick Upload Controls */}
         {showUploadControls && (
           <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
             <input
