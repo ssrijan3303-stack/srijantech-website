@@ -18,19 +18,12 @@ export const FounderPhoto: React.FC<FounderPhotoProps> = ({
   onPhotoChange,
   showUploadControls = false,
 }) => {
-  // Candidate fallback list prioritizing direct static asset first to prevent vector fallback glitch
-  const fallbackList = [
-    '/assets/founder.jpeg',
-    '/assets/founder.jpg',
-    '/assets/founder.png',
-    '/images/founder/srijan-singh-founder.jpg',
-    '/api/founder-photo/image',
-  ];
-  const [candidateIndex, setCandidateIndex] = useState<number>(0);
+  // Direct lock to root founder.jpg to completely prevent vector or 404 fallback glitches
   const [imgSrc, setImgSrc] = useState<string>(() => {
     if (photoUrl && photoUrl.trim()) return photoUrl;
-    return fallbackList[0];
+    return '/founder.jpg';
   });
+
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -56,14 +49,6 @@ export const FounderPhoto: React.FC<FounderPhotoProps> = ({
       window.removeEventListener('founder_photo_updated' as any, handleGlobalUpdate);
     };
   }, []);
-
-  const handleImageError = () => {
-    if (candidateIndex < fallbackList.length - 1) {
-      const nextIndex = candidateIndex + 1;
-      setCandidateIndex(nextIndex);
-      setImgSrc(fallbackList[nextIndex]);
-    }
-  };
 
   const processAndUploadFile = async (file: File) => {
     if (!file) return;
@@ -161,7 +146,6 @@ export const FounderPhoto: React.FC<FounderPhotoProps> = ({
         <img
           src={imgSrc}
           alt="Srijan Singh - Founder & Director, SrijanTech"
-          onError={handleImageError}
           className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.015]"
           loading="eager"
         />
