@@ -19,13 +19,12 @@ export const AdminLoginPage: React.FC = () => {
 
   const handleForgotPassword = (e: React.MouseEvent) => {
     e.preventDefault();
-    setMessage('Password reset instructions have been sent to your registered admin contact.');
+    setMessage('Reset instructions sent to your registered number.');
   };
 
   return (
     <div className="min-h-screen bg-[#030712] flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full bg-[#0b1324] border border-slate-800 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
-        {/* Glow effect */}
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-sky-500/10 rounded-full blur-3xl"></div>
 
         <div className="text-center mb-8">
