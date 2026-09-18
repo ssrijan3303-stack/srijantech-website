@@ -1,19 +1,16 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Lock, Phone, ArrowRight, ShieldCheck } from 'lucide-react';
 
 export const AdminLoginPage: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple admin credential check or auth logic
     if (phone === 'admin' || phone.length >= 10) {
       localStorage.setItem('isAdminAuthenticated', 'true');
-      navigate('/admin/dashboard');
+      window.location.href = '/admin/dashboard';
     } else {
       setError('Please enter valid admin credentials.');
     }
