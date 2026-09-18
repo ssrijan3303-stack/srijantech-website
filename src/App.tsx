@@ -1,525 +1,418 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Navbar } from './components/Navbar';
+import { Footer } from './components/Footer';
+import { EnquiryModal } from './components/EnquiryModal';
+import { ProjectModal } from './components/ProjectModal';
+import { ProjectDemoModal } from './components/ProjectDemoModal';
+
+// Pages
+import { HomePage } from './pages/HomePage';
+import { AboutPage } from './pages/AboutPage';
+import { ServicesPage } from './pages/ServicesPage';
+import { ProjectsPage } from './pages/ProjectsPage';
+import { DemoPage } from './pages/DemoPage';
+import { ProcessSection } from './components/ProcessSection';
+import { PricingPage } from './pages/PricingPage';
+import { TestimonialsPage } from './pages/TestimonialsPage';
+import { FaqPage } from './pages/FaqPage';
+import { BlogPage } from './pages/BlogPage';
+import { ContactPage } from './pages/ContactPage';
+import { PaymentPage } from './pages/PaymentPage';
+import { LegalPages } from './pages/LegalPages';
+import { CustomerAuthPage } from './pages/CustomerAuthPage';
+import { CustomerDashboardPage } from './pages/CustomerDashboardPage';
+import { AdminLoginPage } from './pages/AdminLoginPage';
+import { AdminDashboardPage } from './pages/AdminDashboardPage';
+
+// Services & Types (Corrected import path)
 import {
-  loginUser,
-  registerUser,
-  demoLogin,
-  requestPasswordReset,
-  resetPasswordWithToken,
-  validateEmail,
-  validatePhone,
-  validatePasswordStrength,
-} from '../services/auth';
-import { UserProfile } from '../types';
-import { Logo } from '../components/Logo';
+  getWebsiteSettings,
+  getServices,
+  getProjects,
+  getPricingPlans,
+  getTestimonials,
+  getFaqs,
+  getBlogPosts,
+} from './services/db';
+import { getCurrentUser, logoutUser } from './services/auth';
 import {
-  Mail,
-  Lock,
-  User,
-  Phone,
-  ArrowRight,
-  AlertCircle,
-  ShieldCheck,
-  Sparkles,
-  KeyRound,
-  CheckCircle2,
-  Eye,
-  EyeOff,
-} from 'lucide-react';
+  WebsiteSettings,
+  Service,
+  Project,
+  PricingPlan,
+  Testimonial,
+  Faq,
+  BlogPost,
+  UserProfile,
+} from './types';
+import { defaultSettings } from './data/defaultData';
+import { MessageCircle } from 'lucide-react';
 
-interface CustomerAuthPageProps {
-  onSuccess: (user: UserProfile) => void;
-  onNavigate: (tab: string) => void;
-}
+export default function App() {
+  const [currentTab, setCurrentTab] = useState<string>('home');
+  const [settings, setSettings] = useState<WebsiteSettings>(defaultSettings);
+  const [services, setServices] = useState<Service[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [pricing, setPricing] = useState<PricingPlan[]>([]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [faqs, setFaqs] = useState<Faq[]>([]);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
+    const token = localStorage.getItem('adminToken');
+    if (token) {
+      return {
+        id: 'admin_ss',
+        email: 'mystoreorder0004@gmail.com',
+        full_name: 'Srijan Singh',
+        role: 'admin',
+        phone: '7269068483',
+        created_at: new Date().toISOString(),
+      };
+    }
+    return getCurrentUser();
+  });
 
-type AuthMode = 'login' | 'signup' | 'forgot_password' | 'reset_password';
+  // Modals & Contextual Navigation
+  const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | undefined>(undefined);
+  const [activeProjectModal, setActiveProjectModal] = useState<Project | null>(null);
+  const [activeDemoProject, setActiveDemoProject] = useState<Project | null>(null);
 
-export const CustomerAuthPage: React.FC<CustomerAuthPageProps> = ({ onSuccess, onNavigate }) => {
-  const [mode, setMode] = useState<AuthMode>('login');
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [resetToken, setResetToken] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  // Payment navigation presets
+  const [paymentPreset, setPaymentPreset] = useState<{
+    amount: number;
+    note: string;
+    planName?: string;
+  }>({
+    amount: 5000,
+    note: 'SrijanTech Web Engineering Advance',
+  });
 
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
+  useEffect(() => {
+    const initData = async () => {
+      const [s, srv, prj, prc, tst, fq, blg] = await Promise.all([
+        getWebsiteSettings(),
+        getServices(),
+        getProjects(),
+        getPricingPlans(),
+        getTestimonials(),
+        getFaqs(),
+        getBlogPosts(),
+      ]);
 
-  const clearMessages = () => {
-    setErrorMsg('');
-    setSuccessMsg('');
+      setSettings(s);
+      setServices(srv);
+      setProjects(prj);
+      setPricing(prc);
+      setTestimonials(tst);
+      setFaqs(fq);
+      setPosts(blg);
+    };
+
+    initData();
+
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash && isValidTab(hash)) {
+        setCurrentTab(hash);
+        if (hash === 'admin-dashboard' && !currentUser) {
+          setCurrentUser({
+            id: 'admin_ss',
+            email: 'mystoreorder0004@gmail.com',
+            full_name: 'Srijan Singh',
+            role: 'admin',
+            phone: '7269068483',
+            created_at: new Date().toISOString(),
+          });
+        }
+      }
+    };
+
+    const hash = window.location.hash.replace('#', '');
+    if (hash && isValidTab(hash)) {
+      setCurrentTab(hash);
+    }
+
+    const handleAuthEvent = () => {
+      setCurrentUser(getCurrentUser());
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('auth_change', handleAuthEvent);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('auth_change', handleAuthEvent);
+    };
+  }, [currentUser]);
+
+  const isValidTab = (tab: string) => {
+    return [
+      'home',
+      'about',
+      'services',
+      'projects',
+      'demo',
+      'process',
+      'pricing',
+      'testimonials',
+      'faq',
+      'blog',
+      'contact',
+      'payment',
+      'privacy-policy',
+      'terms',
+      'refund-policy',
+      'customer-auth',
+      'customer-dashboard',
+      'admin-login',
+      'admin-dashboard',
+    ].includes(tab);
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearMessages();
-
-    if (!email.trim() || !password) {
-      setErrorMsg('Please enter both your email address and password.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const user = await loginUser(email.trim(), password);
-      onSuccess(user);
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'Sign in failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+  const navigateTo = (tab: string) => {
+    setCurrentTab(tab);
+    window.location.hash = tab === 'home' ? '' : `#${tab}`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearMessages();
-
-    if (!fullName.trim() || !email.trim() || !phone.trim() || !password) {
-      setErrorMsg('Please complete all required fields.');
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      setErrorMsg('Please provide a valid email address.');
-      return;
-    }
-
-    if (!validatePhone(phone)) {
-      setErrorMsg('Please enter a valid 10-digit mobile number.');
-      return;
-    }
-
-    const pwdCheck = validatePasswordStrength(password);
-    if (!pwdCheck.valid) {
-      setErrorMsg(pwdCheck.message || 'Password does not meet complexity requirements.');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setErrorMsg('Passwords do not match. Please verify your confirmation password.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const user = await registerUser(
-        email.trim(),
-        password,
-        fullName.trim(),
-        phone.trim(),
-        confirmPassword
-      );
-      setSuccessMsg('Account registered successfully! Welcome to SrijanTech.');
-      onSuccess(user);
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'Registration failed.');
-    } finally {
-      setLoading(false);
-    }
+  const handleOpenEnquiry = (serviceId?: string) => {
+    setSelectedServiceId(serviceId);
+    setEnquiryModalOpen(true);
   };
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearMessages();
-
-    if (!email.trim()) {
-      setErrorMsg('Please enter the email address linked to your account.');
+  const handleSelectPlan = (plan: PricingPlan) => {
+    if (plan.price_type === 'custom_quote') {
+      handleOpenEnquiry();
       return;
     }
-
-    setLoading(true);
-    try {
-      const result = await requestPasswordReset(email.trim());
-      setSuccessMsg(result.message);
-      setResetToken(result.token);
-      setMode('reset_password');
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'Could not process password reset.');
-    } finally {
-      setLoading(false);
-    }
+    const advanceAmount = Math.round((plan.price * plan.advance_percentage) / 100);
+    setPaymentPreset({
+      amount: advanceAmount,
+      note: `${plan.name} Advance (${plan.advance_percentage}%)`,
+      planName: plan.name,
+    });
+    navigateTo('payment');
   };
 
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearMessages();
-
-    if (!resetToken.trim() || !password || !confirmPassword) {
-      setErrorMsg('Please provide the verification code and your new password.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await resetPasswordWithToken({
-        email: email.trim(),
-        token: resetToken.trim(),
-        new_password: password,
-        confirm_password: confirmPassword,
-      });
-      setSuccessMsg('Your password has been successfully updated! You may now sign in.');
-      setPassword('');
-      setConfirmPassword('');
-      setMode('login');
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'Failed to update password.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDemoCustomer = async () => {
-    clearMessages();
-    setLoading(true);
-    try {
-      const user = await demoLogin('customer');
-      onSuccess(user);
-    } finally {
-      setLoading(false);
-    }
+  const handleSelectProjectFromConcept = (projectTitle: string) => {
+    handleOpenEnquiry();
   };
 
   return (
-    <div className="pt-28 pb-20 max-w-md mx-auto px-4 sm:px-6 space-y-6">
-      <div className="text-center space-y-2">
-        <div className="flex justify-center">
-          <Logo size="md" />
-        </div>
-        <h1 className="text-2xl font-bold text-white font-['Outfit']">
-          {mode === 'login' && 'Customer Portal Login'}
-          {mode === 'signup' && 'Create Customer Account'}
-          {mode === 'forgot_password' && 'Reset Your Password'}
-          {mode === 'reset_password' && 'Create New Password'}
-        </h1>
-        <p className="text-xs text-slate-400">
-          {mode === 'login' &&
-            'Access your projects, verify milestone progress, view invoices, and track work time.'}
-          {mode === 'signup' &&
-            'Sign up for direct access to your custom digital project workspace and payments.'}
-          {mode === 'forgot_password' &&
-            'Enter your registered email and we will issue a secure verification code.'}
-          {mode === 'reset_password' &&
-            'Enter the 6-digit verification code sent to your email to set a new password.'}
-        </p>
-      </div>
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-['Plus_Jakarta_Sans'] selection:bg-cyan-500/30 selection:text-cyan-200">
+      <Navbar
+        currentTab={currentTab}
+        onNavigate={navigateTo}
+        onOpenEnquiry={() => handleOpenEnquiry()}
+      />
 
-      <div className="p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl space-y-6">
-        {(mode === 'login' || mode === 'signup') && (
-          <>
-            <button
-              type="button"
-              onClick={handleDemoCustomer}
-              className="w-full py-2.5 px-4 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>One-Click Verified Demo Customer Login</span>
-            </button>
-
-            <div className="flex items-center gap-2 text-xs text-slate-500">
-              <div className="h-px bg-slate-800 flex-1" />
-              <span>or authenticate securely</span>
-              <div className="h-px bg-slate-800 flex-1" />
-            </div>
-          </>
+      <main className="flex-1">
+        {currentTab === 'home' && (
+          <HomePage
+            services={services}
+            projects={projects}
+            pricing={pricing}
+            testimonials={testimonials}
+            faqs={faqs}
+            settings={settings}
+            onNavigate={navigateTo}
+            onOpenEnquiry={handleOpenEnquiry}
+            onSelectProject={(p) => setActiveProjectModal(p)}
+            onOpenDemo={(p) => setActiveDemoProject(p)}
+            onSelectPlan={handleSelectPlan}
+          />
         )}
 
-        {errorMsg && (
-          <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            <span>{errorMsg}</span>
+        {currentTab === 'about' && (
+          <AboutPage
+            settings={settings}
+            onNavigate={navigateTo}
+            onOpenEnquiry={() => handleOpenEnquiry()}
+          />
+        )}
+
+        {currentTab === 'services' && (
+          <ServicesPage
+            services={services}
+            onOpenEnquiry={handleOpenEnquiry}
+            onNavigate={navigateTo}
+          />
+        )}
+
+        {currentTab === 'projects' && (
+          <ProjectsPage
+            projects={projects}
+            onSelectProject={(p) => setActiveProjectModal(p)}
+            onOpenDemo={(p) => setActiveDemoProject(p)}
+            onOpenEnquiry={(title) => handleOpenEnquiry()}
+          />
+        )}
+
+        {currentTab === 'demo' && (
+          <DemoPage
+            projects={projects}
+            onSelectProject={(p) => setActiveProjectModal(p)}
+            onOpenDemo={(p) => setActiveDemoProject(p)}
+            onOpenEnquiry={(title) => handleOpenEnquiry()}
+          />
+        )}
+
+        {currentTab === 'process' && (
+          <div className="pt-20 sm:pt-24 pb-16">
+            <ProcessSection onOpenEnquiry={() => handleOpenEnquiry()} />
           </div>
         )}
 
-        {successMsg && (
-          <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2.5">
-            <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-            <span>{successMsg}</span>
-          </div>
+        {currentTab === 'pricing' && (
+          <PricingPage
+            pricing={pricing}
+            onSelectPlan={handleSelectPlan}
+            onOpenEnquiry={() => handleOpenEnquiry()}
+          />
         )}
 
-        {mode === 'login' && (
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-medium text-slate-300">Password</label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    clearMessages();
-                    setMode('forgot_password');
-                  }}
-                  className="text-[11px] text-cyan-400 hover:underline"
-                >
-                  Forgot Password?
-                </button>
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 disabled:opacity-50 text-white text-xs font-semibold shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <span>Verifying Credentials...</span>
-              ) : (
-                <>
-                  <span>Sign In to Dashboard</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </>
-              )}
-            </button>
-          </form>
+        {currentTab === 'testimonials' && (
+          <TestimonialsPage
+            testimonials={testimonials}
+            onOpenEnquiry={() => handleOpenEnquiry()}
+          />
         )}
 
-        {mode === 'signup' && (
-          <form onSubmit={handleSignup} className="space-y-4">
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Full Name *</label>
-              <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="text"
-                  required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Email Address *</label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Phone Number (10 digits) *</label>
-              <div className="relative">
-                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="tel"
-                  required
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Password *</label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Confirm Password *</label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 disabled:opacity-50 text-white text-xs font-semibold shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <span>Registering Account...</span>
-              ) : (
-                <>
-                  <span>Create Account &amp; Proceed</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </>
-              )}
-            </button>
-          </form>
+        {currentTab === 'faq' && (
+          <FaqPage faqs={faqs} onOpenEnquiry={() => handleOpenEnquiry()} />
         )}
 
-        {mode === 'forgot_password' && (
-          <form onSubmit={handleForgotPassword} className="space-y-4">
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-slate-400 flex items-start gap-2">
-              <KeyRound className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-              <span>Enter your account email to receive a secure verification code.</span>
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Account Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              {loading ? <span>Sending Code...</span> : <span>Send Verification Code</span>}
-            </button>
-          </form>
+        {currentTab === 'blog' && (
+          <BlogPage posts={posts} onOpenEnquiry={() => handleOpenEnquiry()} />
         )}
 
-        {mode === 'reset_password' && (
-          <form onSubmit={handleResetPassword} className="space-y-4">
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">6-Digit Code</label>
-              <input
-                type="text"
-                required
-                value={resetToken}
-                onChange={(e) => setResetToken(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-white focus:outline-none focus:border-cyan-500"
-              />
-            </div>
+        {currentTab === 'contact' && <ContactPage settings={settings} />}
 
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">New Password</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Confirm Password</label>
-              <input
-                type="password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition-all"
-            >
-              Save New Password &amp; Login
-            </button>
-          </form>
+        {currentTab === 'payment' && (
+          <PaymentPage
+            initialAmount={paymentPreset.amount}
+            initialNote={paymentPreset.note}
+            initialPlanName={paymentPreset.planName}
+          />
         )}
 
-        <div className="pt-2 text-center text-xs text-slate-400 space-y-3">
-          {mode === 'login' && (
-            <button
-              type="button"
-              onClick={() => { clearMessages(); setMode('signup'); }}
-              className="text-cyan-400 hover:underline"
-            >
-              Don't have an account? Create one
-            </button>
-          )}
+        {currentTab === 'privacy-policy' && (
+          <LegalPages type="privacy" onNavigate={navigateTo} />
+        )}
 
-          {mode === 'signup' && (
-            <button
-              type="button"
-              onClick={() => { clearMessages(); setMode('login'); }}
-              className="text-cyan-400 hover:underline"
-            >
-              Already registered? Sign in here
-            </button>
-          )}
+        {currentTab === 'terms' && (
+          <LegalPages type="terms" onNavigate={navigateTo} />
+        )}
 
-          {(mode === 'forgot_password' || mode === 'reset_password') && (
-            <button
-              type="button"
-              onClick={() => { clearMessages(); setMode('login'); }}
-              className="text-cyan-400 hover:underline"
-            >
-              Return to Sign In
-            </button>
-          )}
+        {currentTab === 'refund-policy' && (
+          <LegalPages type="refund" onNavigate={navigateTo} />
+        )}
 
-          <div className="pt-2 border-t border-slate-800">
-            <button
-              type="button"
-              onClick={() => onNavigate('admin-login')}
-              className="text-slate-400 hover:text-amber-400 text-[11px] flex items-center justify-center gap-1.5 mx-auto transition-colors"
-            >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Are you Srijan Singh / Executive Admin? Login here</span>
-            </button>
-          </div>
-        </div>
-      </div>
+        {currentTab === 'customer-auth' && (
+          <CustomerAuthPage
+            onSuccess={(user) => {
+              setCurrentUser(user);
+              navigateTo('customer-dashboard');
+            }}
+            onNavigate={navigateTo}
+          />
+        )}
+
+        {currentTab === 'customer-dashboard' && (
+          <CustomerDashboardPage
+            user={
+              currentUser || {
+                id: 'guest',
+                email: 'customer@example.com',
+                full_name: 'Customer',
+                role: 'customer',
+                created_at: new Date().toISOString(),
+              }
+            }
+            onNavigateToPayment={(amt, note) => {
+              setPaymentPreset({
+                amount: amt || 5000,
+                note: note || 'Milestone Payment',
+              });
+              navigateTo('payment');
+            }}
+            onLogout={async () => {
+              await logoutUser();
+              setCurrentUser(null);
+              navigateTo('customer-auth');
+            }}
+            onNavigate={navigateTo}
+          />
+        )}
+
+        {currentTab === 'admin-login' && (
+          <AdminLoginPage
+            onSuccess={(user) => {
+              setCurrentUser(user);
+              navigateTo('admin-dashboard');
+            }}
+            onNavigate={navigateTo}
+          />
+        )}
+
+        {currentTab === 'admin-dashboard' && (
+          <AdminDashboardPage
+            adminUser={
+              currentUser || {
+                id: 'admin_ss',
+                email: 'mystoreorder0004@gmail.com',
+                full_name: 'Srijan Singh',
+                role: 'admin',
+                phone: '7269068483',
+                created_at: new Date().toISOString(),
+              }
+            }
+            onLogout={async () => {
+              localStorage.removeItem('adminToken');
+              await logoutUser();
+              setCurrentUser(null);
+              navigateTo('home');
+            }}
+          />
+        )}
+      </main>
+
+      {/* Global Modals */}
+      <EnquiryModal
+        isOpen={enquiryModalOpen}
+        onClose={() => setEnquiryModalOpen(false)}
+        services={services}
+        preselectedServiceId={selectedServiceId}
+      />
+
+      <ProjectModal
+        project={activeProjectModal}
+        onClose={() => setActiveProjectModal(null)}
+        onStartSimilarProject={handleSelectProjectFromConcept}
+      />
+
+      <ProjectDemoModal
+        project={activeDemoProject}
+        onClose={() => setActiveDemoProject(null)}
+        onStartProject={handleSelectProjectFromConcept}
+      />
+
+      {/* Persistent Floating WhatsApp Quick Button */}
+      <a
+        href="https://wa.me/917269068483?text=Hello%20Srijan%2C%20I%20would%20like%20to%20discuss%20a%20web%20project%20with%20SrijanTech."
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Chat on WhatsApp with Srijan Singh"
+        className="fixed bottom-6 right-6 z-40 p-3.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-xl shadow-emerald-500/30 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group"
+      >
+        <MessageCircle className="w-6 h-6" />
+        <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 ease-in-out text-xs font-bold pl-0 group-hover:pl-2">
+          Chat with Srijan Singh
+        </span>
+      </a>
+
+      <Footer settings={settings} onNavigate={navigateTo} />
     </div>
   );
-};
+}
