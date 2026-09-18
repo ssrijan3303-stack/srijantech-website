@@ -17,9 +17,9 @@ export const AdminLoginPage: React.FC = () => {
     }
   };
 
-  const handleForgotPassword = (e: React.MouseEvent) => {
+  const handleForgotPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setMessage('Reset instructions sent to your registered number.');
+    setMessage('Password reset instructions sent to your registered admin number.');
   };
 
   return (
@@ -75,7 +75,7 @@ export const AdminLoginPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleForgotPassword}
-                className="text-xs text-sky-400 hover:underline font-medium focus:outline-none"
+                className="text-xs text-sky-400 hover:underline font-medium focus:outline-none cursor-pointer"
               >
                 Forgot Password?
               </button>
