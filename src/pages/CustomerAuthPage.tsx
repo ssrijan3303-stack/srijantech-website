@@ -1,523 +1,153 @@
 import React, { useState } from 'react';
-import {
-  loginUser,
-  registerUser,
-  demoLogin,
-  requestPasswordReset,
-  resetPasswordWithToken,
-  validateEmail,
-  validatePhone,
-  validatePasswordStrength,
-} from '../services/auth';
-import { UserProfile } from '../types';
-import { Logo } from '../components/Logo';
-import {
-  Mail,
-  Lock,
-  User,
-  Phone,
-  ArrowRight,
-  AlertCircle,
-  ShieldCheck,
-  Sparkles,
-  KeyRound,
-  CheckCircle2,
-  Eye,
-  EyeOff,
-} from 'lucide-react';
+import { Mail, Lock, Phone, User, ArrowRight } from 'lucide-react';
 
-interface CustomerAuthPageProps {
-  onSuccess: (user: UserProfile) => void;
-  onNavigate: (tab: string) => void;
-}
+export const CustomerAuthPage: React.FC = () => {
+  const [isLogin, setIsLogin] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: ''
+  });
 
-type AuthMode = 'login' | 'signup' | 'forgot_password' | 'reset_password';
-
-export const CustomerAuthPage: React.FC<CustomerAuthPageProps> = ({ onSuccess, onNavigate }) => {
-  const [mode, setMode] = useState<AuthMode>('login');
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [resetToken, setResetToken] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
-
-  const clearMessages = () => {
-    setErrorMsg('');
-    setSuccessMsg('');
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    clearMessages();
-
-    if (!email.trim() || !password) {
-      setErrorMsg('Please enter both your email address and password.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const user = await loginUser(email.trim(), password);
-      onSuccess(user);
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'Sign in failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearMessages();
-
-    if (!fullName.trim() || !email.trim() || !phone.trim() || !password) {
-      setErrorMsg('Please complete all required fields.');
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      setErrorMsg('Please provide a valid email address.');
-      return;
-    }
-
-    if (!validatePhone(phone)) {
-      setErrorMsg('Please enter a valid 10-digit mobile number.');
-      return;
-    }
-
-    const pwdCheck = validatePasswordStrength(password);
-    if (!pwdCheck.valid) {
-      setErrorMsg(pwdCheck.message || 'Password does not meet complexity requirements.');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setErrorMsg('Passwords do not match. Please verify your confirmation password.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const user = await registerUser(
-        email.trim(),
-        password,
-        fullName.trim(),
-        phone.trim(),
-        confirmPassword
-      );
-      setSuccessMsg('Account registered successfully! Welcome to SrijanTech.');
-      onSuccess(user);
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'Registration failed.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearMessages();
-
-    if (!email.trim()) {
-      setErrorMsg('Please enter the email address linked to your account.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const result = await requestPasswordReset(email.trim());
-      setSuccessMsg(result.message);
-      setResetToken(result.token);
-      setMode('reset_password');
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'Could not process password reset.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearMessages();
-
-    if (!resetToken.trim() || !password || !confirmPassword) {
-      setErrorMsg('Please provide the verification code and your new password.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await resetPasswordWithToken({
-        email: email.trim(),
-        token: resetToken.trim(),
-        new_password: password,
-        confirm_password: confirmPassword,
-      });
-      setSuccessMsg('Your password has been successfully updated! You may now sign in.');
-      setPassword('');
-      setConfirmPassword('');
-      setMode('login');
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'Failed to update password.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDemoCustomer = async () => {
-    clearMessages();
-    setLoading(true);
-    try {
-      const user = await demoLogin('customer');
-      onSuccess(user);
-    } finally {
-      setLoading(false);
-    }
+    // Handle customer login or registration logic here
+    console.log('Customer form submitted:', formData);
   };
 
   return (
-    <div className="pt-28 pb-20 max-w-md mx-auto px-4 sm:px-6 space-y-6">
-      <div className="text-center space-y-2">
-        <div className="flex justify-center">
-          <Logo size="md" />
+    <div className="min-h-screen bg-[#030712] flex items-center justify-center px-4 py-12">
+      <div className="max-w-md w-full bg-[#0b1324] border border-slate-800 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+        {/* Glow effect */}
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-sky-500/10 rounded-full blur-3xl"></div>
+
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-white">
+            {isLogin ? 'Customer Login' : 'Create Customer Account'}
+          </h2>
+          <p className="text-slate-400 text-sm mt-1">
+            {isLogin ? 'Enter your credentials to continue' : 'Sign up to access your dashboard'}
+          </p>
         </div>
-        <h1 className="text-2xl font-bold text-white font-['Outfit']">
-          {mode === 'login' && 'Customer Portal Login'}
-          {mode === 'signup' && 'Create Customer Account'}
-          {mode === 'forgot_password' && 'Reset Your Password'}
-          {mode === 'reset_password' && 'Create New Password'}
-        </h1>
-        <p className="text-xs text-slate-400">
-          {mode === 'login' &&
-            'Access your projects, verify milestone progress, view invoices, and track work time.'}
-          {mode === 'signup' &&
-            'Sign up for direct access to your custom digital project workspace and payments.'}
-          {mode === 'forgot_password' &&
-            'Enter your registered email and we will issue a secure verification code.'}
-          {mode === 'reset_password' &&
-            'Enter the 6-digit verification code sent to your email to set a new password.'}
-        </p>
-      </div>
 
-      <div className="p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl space-y-6">
-        {(mode === 'login' || mode === 'signup') && (
-          <>
-            <button
-              type="button"
-              onClick={handleDemoCustomer}
-              className="w-full py-2.5 px-4 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>One-Click Verified Demo Customer Login</span>
-            </button>
-
-            <div className="flex items-center gap-2 text-xs text-slate-500">
-              <div className="h-px bg-slate-800 flex-1" />
-              <span>or authenticate securely</span>
-              <div className="h-px bg-slate-800 flex-1" />
-            </div>
-          </>
-        )}
-
-        {errorMsg && (
-          <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            <span>{errorMsg}</span>
-          </div>
-        )}
-
-        {successMsg && (
-          <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2.5">
-            <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-            <span>{successMsg}</span>
-          </div>
-        )}
-
-        {mode === 'login' && (
-          <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {!isLogin && (
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Email Address</label>
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                Full Name *
+              </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-medium text-slate-300">Password</label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    clearMessages();
-                    setMode('forgot_password');
-                  }}
-                  className="text-[11px] text-cyan-400 hover:underline"
-                >
-                  Forgot Password?
-                </button>
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 disabled:opacity-50 text-white text-xs font-semibold shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <span>Verifying Credentials...</span>
-              ) : (
-                <>
-                  <span>Sign In to Dashboard</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </>
-              )}
-            </button>
-          </form>
-        )}
-
-        {mode === 'signup' && (
-          <form onSubmit={handleSignup} className="space-y-4">
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Full Name *</label>
-              <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                  <User className="w-4 h-4" />
+                </span>
                 <input
                   type="text"
                   required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
+                  placeholder="Enter your name"
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  className="w-full bg-[#030712] border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-colors"
                 />
               </div>
             </div>
+          )}
 
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Email Address *</label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-              </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              Email Address *
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                <Mail className="w-4 h-4" />
+              </span>
+              <input
+                type="email"
+                required
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full bg-[#030712] border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-colors"
+              />
             </div>
+          </div>
 
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Phone Number (10 digits) *</label>
-              <div className="relative">
-                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="tel"
-                  required
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-              </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              Phone Number (10 digits) *
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                <Phone className="w-4 h-4" />
+              </span>
+              <input
+                type="tel"
+                required
+                placeholder="Enter your number"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="w-full bg-[#030712] border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-colors"
+              />
             </div>
+          </div>
 
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Password *</label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              Password *
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                <Lock className="w-4 h-4" />
+              </span>
+              <input
+                type="password"
+                required
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="w-full bg-[#030712] border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-colors"
+              />
             </div>
+          </div>
 
+          {!isLogin && (
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Confirm Password *</label>
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                Confirm Password *
+              </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                  <Lock className="w-4 h-4" />
+                </span>
                 <input
                   type="password"
                   required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
+                  placeholder="Confirm password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  className="w-full bg-[#030712] border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-colors"
                 />
               </div>
             </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 disabled:opacity-50 text-white text-xs font-semibold shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <span>Registering Account...</span>
-              ) : (
-                <>
-                  <span>Create Account &amp; Proceed</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </>
-              )}
-            </button>
-          </form>
-        )}
-
-        {mode === 'forgot_password' && (
-          <form onSubmit={handleForgotPassword} className="space-y-4">
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-slate-400 flex items-start gap-2">
-              <KeyRound className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-              <span>Enter your account email to receive a secure verification code.</span>
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Account Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              {loading ? <span>Sending Code...</span> : <span>Send Verification Code</span>}
-            </button>
-          </form>
-        )}
-
-        {mode === 'reset_password' && (
-          <form onSubmit={handleResetPassword} className="space-y-4">
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">6-Digit Code</label>
-              <input
-                type="text"
-                required
-                value={resetToken}
-                onChange={(e) => setResetToken(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-white focus:outline-none focus:border-cyan-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">New Password</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Confirm Password</label>
-              <input
-                type="password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition-all"
-            >
-              Save New Password &amp; Login
-            </button>
-          </form>
-        )}
-
-        <div className="pt-2 text-center text-xs text-slate-400 space-y-3">
-          {mode === 'login' && (
-            <button
-              type="button"
-              onClick={() => { clearMessages(); setMode('signup'); }}
-              className="text-cyan-400 hover:underline"
-            >
-              Don't have an account? Create one
-            </button>
           )}
 
-          {mode === 'signup' && (
-            <button
-              type="button"
-              onClick={() => { clearMessages(); setMode('login'); }}
-              className="text-cyan-400 hover:underline"
-            >
-              Already registered? Sign in here
-            </button>
-          )}
+          <button
+            type="submit"
+            className="w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center space-x-2 text-sm mt-2"
+          >
+            <span>{isLogin ? 'Login to Account' : 'Create Account & Proceed'}</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </form>
 
-          {(mode === 'forgot_password' || mode === 'reset_password') && (
-            <button
-              type="button"
-              onClick={() => { clearMessages(); setMode('login'); }}
-              className="text-cyan-400 hover:underline"
-            >
-              Return to Sign In
-            </button>
-          )}
-
-          <div className="pt-2 border-t border-slate-800">
-            <button
-              type="button"
-              onClick={() => onNavigate('admin-login')}
-              className="text-slate-400 hover:text-amber-400 text-[11px] flex items-center justify-center gap-1.5 mx-auto transition-colors"
-            >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Are you Srijan Singh / Executive Admin? Login here</span>
-            </button>
-          </div>
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => setIsLogin(!isLogin)}
+            className="text-xs text-sky-400 hover:underline font-medium focus:outline-none"
+          >
+            {isLogin ? "Don't have an account? Sign up" : "Already have an account? Login"}
+          </button>
         </div>
       </div>
     </div>
