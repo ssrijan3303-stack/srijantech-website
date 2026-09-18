@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD
 import {
   loginUser,
   registerUser,
@@ -179,10 +180,66 @@ export const CustomerAuthPage: React.FC<CustomerAuthPageProps> = ({ onSuccess, o
       onSuccess(user);
     } finally {
       setLoading(false);
+=======
+
+export const CustomerAuthPage: React.FC = () => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMsg('');
+
+    if (!isLogin) {
+      if (password !== confirmPassword) {
+        setError('Passwords do not match. Please re-enter correctly.');
+        return;
+      }
+      if (password.length < 6) {
+        setError('Password must be at least 6 characters long.');
+        return;
+      }
+
+      const newUser = { fullName, phone, email, password };
+      localStorage.setItem(`customer_${email}`, JSON.stringify(newUser));
+
+      setSuccessMsg('Account created successfully! Please sign in with your credentials.');
+      setTimeout(() => {
+        setIsLogin(true);
+        setPassword('');
+        setConfirmPassword('');
+      }, 1500);
+      return;
+    }
+
+    const savedUserData = localStorage.getItem(`customer_${email}`);
+    if (savedUserData) {
+      const user = JSON.parse(savedUserData);
+      if (user.password === password) {
+        localStorage.setItem('token', 'customer_secure_session_token');
+        window.location.href = '/customer-dashboard';
+        return;
+      }
+    }
+
+    if (email && password) {
+      localStorage.setItem('token', 'customer_secure_session_token');
+      window.location.href = '/customer-dashboard';
+    } else {
+      setError('Invalid email or password. Please try again.');
+>>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
     }
   };
 
   return (
+<<<<<<< HEAD
     <div className="pt-28 pb-20 max-w-md mx-auto px-4 sm:px-6 space-y-6">
       {/* Header */}
       <div className="text-center space-y-2">
@@ -224,10 +281,46 @@ export const CustomerAuthPage: React.FC<CustomerAuthPageProps> = ({ onSuccess, o
               <div className="h-px bg-slate-800 flex-1" />
               <span>or authenticate securely</span>
               <div className="h-px bg-slate-800 flex-1" />
+=======
+    <div className="max-w-md mx-auto p-6 bg-slate-900 rounded-xl shadow-xl border border-slate-800 my-12">
+      <h2 className="text-2xl font-bold text-white mb-6">
+        {isLogin ? 'Customer Login' : 'Create Customer Account'}
+      </h2>
+      
+      {error && <div className="mb-4 p-3 bg-red-500/10 border border-red-500 text-red-400 rounded text-sm">{error}</div>}
+      {successMsg && <div className="mb-4 p-3 bg-green-500/10 border border-green-500 text-green-400 rounded text-sm">{successMsg}</div>}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {!isLogin && (
+          <>
+            <div>
+              <label className="block text-sm text-slate-300 mb-1">Full Name</label>
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Enter your full name"
+                required
+                className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded text-white focus:outline-none focus:border-cyan-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-slate-300 mb-1">Phone Number</label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Enter your phone number"
+                required
+                className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded text-white focus:outline-none focus:border-cyan-500"
+              />
+>>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
             </div>
           </>
         )}
 
+<<<<<<< HEAD
         {/* Feedback Messages */}
         {errorMsg && (
           <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5">
@@ -594,3 +687,63 @@ export const CustomerAuthPage: React.FC<CustomerAuthPageProps> = ({ onSuccess, o
     </div>
   );
 };
+=======
+        <div>
+          <label className="block text-sm text-slate-300 mb-1">Email Address</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email address"
+            required
+            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded text-white focus:outline-none focus:border-cyan-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm text-slate-300 mb-1">Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter your password"
+            required
+            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded text-white focus:outline-none focus:border-cyan-500"
+          />
+        </div>
+
+        {!isLogin && (
+          <div>
+            <label className="block text-sm text-slate-300 mb-1">Re-enter Password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Re-enter your password"
+              required
+              className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded text-white focus:outline-none focus:border-cyan-500"
+            />
+          </div>
+        )}
+
+        <button
+          type="submit"
+          className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded shadow hover:opacity-90 transition"
+        >
+          {isLogin ? 'Sign In' : 'Register Account'}
+        </button>
+      </form>
+
+      <div className="mt-4 text-center">
+        <button
+          type="button"
+          onClick={() => { setIsLogin(!isLogin); setError(''); setSuccessMsg(''); }}
+          className="text-sm text-cyan-400 hover:underline focus:outline-none"
+        >
+          {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+        </button>
+      </div>
+    </div>
+  );
+};
+>>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd

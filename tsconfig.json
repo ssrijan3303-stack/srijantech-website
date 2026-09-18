@@ -22,5 +22,15 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
+<<<<<<< HEAD
   }
 }
+=======
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "server.ts"
+  ]
+}
+>>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd

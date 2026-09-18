@@ -103,7 +103,11 @@ export const FounderPhoto: React.FC<FounderPhotoProps> = ({
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+<<<<<<< HEAD
             Authorization: `Bearer ${adminToken}`,
+=======
+            Authorization: `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token') || localStorage.getItem('authToken') || adminToken}`,
+>>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
           },
           body: JSON.stringify({ imageBase64: base64Data }),
         });

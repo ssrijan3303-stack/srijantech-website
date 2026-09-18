@@ -57,7 +57,25 @@ export default function App() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [faqs, setFaqs] = useState<Faq[]>([]);
   const [posts, setPosts] = useState<BlogPost[]>([]);
+<<<<<<< HEAD
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(getCurrentUser());
+=======
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
+    // Check if admin token or user exists on boot
+    const token = localStorage.getItem('adminToken');
+    if (token) {
+      return {
+        id: 'admin_ss',
+        email: 'mystoreorder0004@gmail.com',
+        full_name: 'Srijan Singh',
+        role: 'admin',
+        phone: '7269068483',
+        created_at: new Date().toISOString(),
+      };
+    }
+    return getCurrentUser();
+  });
+>>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
 
   // Modals & Contextual Navigation
   const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
@@ -76,7 +94,10 @@ export default function App() {
   });
 
   useEffect(() => {
+<<<<<<< HEAD
     // Initial data fetch
+=======
+>>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
     const initData = async () => {
       const [s, srv, prj, prc, tst, fq, blg] = await Promise.all([
         getWebsiteSettings(),
@@ -99,12 +120,35 @@ export default function App() {
 
     initData();
 
+<<<<<<< HEAD
     // Handle hash on initial load
+=======
+    // Handle hash on initial load & updates
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash && isValidTab(hash)) {
+        setCurrentTab(hash);
+        // Automatically inject admin user session if navigating to admin dashboard and token exists
+        if (hash === 'admin-dashboard' && !currentUser) {
+          setCurrentUser({
+            id: 'admin_ss',
+            email: 'mystoreorder0004@gmail.com',
+            full_name: 'Srijan Singh',
+            role: 'admin',
+            phone: '7269068483',
+            created_at: new Date().toISOString(),
+          });
+        }
+      }
+    };
+
+>>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
     const hash = window.location.hash.replace('#', '');
     if (hash && isValidTab(hash)) {
       setCurrentTab(hash);
     }
 
+<<<<<<< HEAD
     const handleHashChange = () => {
       const newHash = window.location.hash.replace('#', '');
       if (newHash && isValidTab(newHash)) {
@@ -112,6 +156,8 @@ export default function App() {
       }
     };
 
+=======
+>>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
     const handleAuthEvent = () => {
       setCurrentUser(getCurrentUser());
     };
@@ -123,7 +169,11 @@ export default function App() {
       window.removeEventListener('hashchange', handleHashChange);
       window.removeEventListener('auth_change', handleAuthEvent);
     };
+<<<<<<< HEAD
   }, []);
+=======
+  }, [currentUser]);
+>>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
 
   const isValidTab = (tab: string) => {
     return [
@@ -180,14 +230,20 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-['Plus_Jakarta_Sans'] selection:bg-cyan-500/30 selection:text-cyan-200">
+<<<<<<< HEAD
       {/* Top Sticky Header */}
+=======
+>>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
       <Navbar
         currentTab={currentTab}
         onNavigate={navigateTo}
         onOpenEnquiry={() => handleOpenEnquiry()}
       />
 
+<<<<<<< HEAD
       {/* Main Content Area */}
+=======
+>>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
       <main className="flex-1">
         {currentTab === 'home' && (
           <HomePage
@@ -340,6 +396,7 @@ export default function App() {
         {currentTab === 'admin-dashboard' && (
           <AdminDashboardPage
             adminUser={
+<<<<<<< HEAD
               currentUser && (currentUser.role === 'admin' || currentUser.role === 'super_admin')
                 ? currentUser
                 : {
@@ -352,6 +409,19 @@ export default function App() {
                   }
             }
             onLogout={async () => {
+=======
+              currentUser || {
+                id: 'admin_ss',
+                email: 'mystoreorder0004@gmail.com',
+                full_name: 'Srijan Singh',
+                role: 'admin',
+                phone: '7269068483',
+                created_at: new Date().toISOString(),
+              }
+            }
+            onLogout={async () => {
+              localStorage.removeItem('adminToken');
+>>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
               await logoutUser();
               setCurrentUser(null);
               navigateTo('home');
@@ -394,8 +464,15 @@ export default function App() {
         </span>
       </a>
 
+<<<<<<< HEAD
       {/* Footer */}
       <Footer settings={settings} onNavigate={navigateTo} />
     </div>
   );
 }
+=======
+      <Footer settings={settings} onNavigate={navigateTo} />
+    </div>
+  );
+}
+>>>>>>> 28bc5c985ef3061a04e7a9c25206137591d1b4bd
