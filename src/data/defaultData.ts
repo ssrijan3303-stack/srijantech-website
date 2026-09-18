@@ -14,7 +14,7 @@ export const initialSettings: WebsiteSettings = {
   founder_name: 'Srijan Singh',
   founder_role: 'Founder & Developer — SrijanTech',
   founder_bio:
-    'Srijan Singh is the founder of SrijanTech, focused on creating modern, practical and reliable digital solutions. SrijanTech combines thoughtful design, modern technology and real-world functionality to help businesses and individuals build a stronger digital presence.',
+   founder_photo_url: '/founder.jpg',
   founder_photo_url: '/images/founder/srijan-singh-founder.jpg',
   vision:
     'To build world-class digital software and high-performing websites that empower businesses to scale with modern technological clarity and architectural resilience.',
